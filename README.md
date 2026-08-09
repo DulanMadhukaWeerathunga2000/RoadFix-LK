@@ -1,181 +1,516 @@
-# RoadFix LK — Road Damage Reporting & Management Platform
+# 🚧 RoadFix LK
 
-A citizen-facing platform for reporting potholes, cracks, broken signs, and
-other road/street-light damage in Sri Lanka, with a full admin pipeline for
-verifying, prioritizing, assigning, and resolving reports — plus a live map,
-duplicate-report merging, and an optional AI-assisted damage suggestion.
+### Smart Road Damage Reporting and Management System
 
-## Features
+RoadFix LK is a web-based road damage reporting system designed to help citizens report road problems such as potholes, cracks, damaged roads, and other road-related issues.
 
-**Citizens**
-- Register / login
-- Submit a report: GPS location (auto-detected + draggable map pin), photo,
-  damage type, severity, description
-- Track their own reports and get notified as status changes
-- Confirm a repair is actually done (closes the loop)
+The system allows users to submit road damage reports with location information, photos, severity levels, and descriptions. Administrators can review and manage reported issues through the system.
 
-**Authorities (admin / officer roles)**
-- Dashboard: total / new / pending / completed / critical counts, area-wise
-  breakdown, average repair time
-- Pipeline: **New → Verification → Priority Calculation → Assign Officer →
-  Under Repair → Completed → User Verification**
-- Reject reports with a reason
+---
 
-**Map**
-- Public Leaflet/OpenStreetMap view, color-coded by severity
-  (🔴 critical, 🟠 high, 🟡 medium/low, 🟢 resolved)
+## 📌 Project Overview
 
-**Duplicate detection**
-- New reports within ~50m of an existing active report of the same damage
-  type are automatically merged into it instead of creating a new pipeline
-  entry — the citizen sees *"A similar issue has already been reported
-  nearby."* The merged report's `duplicate_count` feeds directly into its
-  priority score.
+Road damage is a common problem that can affect road safety, transportation, and daily travel.
 
-**Optional AI assist**
-- Uploaded photos are analyzed with an OpenCV heuristic (edge detection +
-  blob shape/size) to suggest a damage type and severity. This is always
-  advisory — the citizen's own selection is what gets saved; the suggestion
-  is shown to admins as a cross-check, never applied automatically.
+RoadFix LK provides a simple digital platform where citizens can:
 
-## Tech stack
+- 📍 Report road problems using their current location
+- 🗺️ Select the exact location using an interactive map
+- 📸 Upload photos of road damage
+- 🚧 Select the type of road damage
+- 🚨 Set the severity level
+- 📝 Add additional information
+- 📋 View submitted reports
+- 🔔 Receive notifications about report updates
 
-| Layer      | Choice                                    |
-|------------|--------------------------------------------|
-| Backend    | Python 3 + Flask (Blueprints, sessions)    |
-| Database   | SQLite via the stdlib `sqlite3` module (see note below) |
-| Frontend   | HTML + Bootstrap 5 + vanilla JS            |
-| Maps       | Leaflet.js + OpenStreetMap tiles           |
-| AI (opt.)  | OpenCV heuristic (no training data needed) |
-| Deployment | Docker                                     |
+Administrators can manage and monitor reported road issues through the system.
 
-> **Why SQLite instead of PostgreSQL?** The original spec called for
-> PostgreSQL. This build uses SQLite so the project runs anywhere with zero
-> external services — genuinely useful for a portfolio/demo. All SQL lives in
-> `models/db.py` and `database/schema.sql`; swapping in PostgreSQL later is a
-> matter of changing the connection layer (e.g. to `psycopg2`) and adjusting
-> a few SQLite-specific functions (`datetime('now')`, `julianday()`).
+---
 
-> **Why no Flask-SocketIO?** Same reasoning — it's an extra service/dependency.
-> "Real-time" status updates are done with lightweight polling
-> (`/api/reports/<id>/status`, hit every 15s from the report-detail page).
-> Swapping in SocketIO later would only touch that one endpoint.
+## ✨ Features
 
-## Project structure
+### 👤 Citizen Features
 
-```
+- User registration and login
+- Secure authentication
+- Report road damage
+- Automatic location detection
+- Interactive map location selection
+- Draggable map marker
+- Photo upload
+- Road damage type selection
+- Severity selection
+- Report description
+- View submitted reports
+- Track report status
+- Notifications
+
+### 🛠️ Admin Features
+
+- Admin login
+- View road damage reports
+- Review submitted reports
+- Verify reports
+- Manage report status
+- Assign reports to responsible officers
+- Monitor road issues
+- View reports on an interactive map
+
+### 🗺️ Map Features
+
+- Interactive OpenStreetMap
+- Leaflet.js map
+- Automatic location detection
+- Draggable location marker
+- Road issue markers
+- Severity-based marker colors
+- Report information popup
+- Map-based road issue visualization
+
+### 🤖 Smart Features
+
+- Duplicate report detection
+- Report priority calculation
+- AI-assisted road damage detection
+- Image-based damage analysis
+
+---
+
+## 🛠️ Technologies Used
+
+### Frontend
+
+- HTML5
+- CSS3
+- Bootstrap
+- JavaScript
+- Leaflet.js
+
+### Backend
+
+- Python
+- Flask
+
+### Database
+
+- SQLite
+
+### Maps
+
+- Leaflet.js
+- OpenStreetMap
+
+### AI / Image Processing
+
+- OpenCV
+- Python
+
+### Development Tools
+
+- Visual Studio Code
+- Git
+- GitHub
+
+---
+
+## 🏗️ System Architecture
+
+```text
+                    ┌──────────────────────┐
+                    │       Citizen        │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │     Web Interface    │
+                    │ HTML / CSS / JS /    │
+                    │ Bootstrap / Leaflet  │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │      Flask API       │
+                    │      Backend         │
+                    └──────────┬───────────┘
+                               │
+                 ┌─────────────┼─────────────┐
+                 │             │             │
+                 ▼             ▼             ▼
+          ┌──────────┐  ┌───────────┐  ┌──────────┐
+          │  SQLite  │  │   Image   │  │   Map    │
+          │ Database │  │ Processing│  │ Services │
+          └──────────┘  └───────────┘  └──────────┘
+                 │
+                 ▼
+          ┌──────────────────┐
+          │      Admin       │
+          │    Dashboard     │
+          └──────────────────┘
+---
+
+
+---
+## 📂 Project Structure
+
+```text
 RoadFix-LK/
-├── app.py                  # Flask app factory + entrypoint
+│
+├── app.py
 ├── config.py
 ├── requirements.txt
+├── README.md
+│
+├── database/
+│   └── schema.sql
+│
 ├── models/
-│   └── db.py                # sqlite3 connection, init_db(), query()/execute() helpers
+│   └── db.py
+│
 ├── routes/
-│   ├── auth.py               # register / login / logout
-│   ├── reports.py            # citizen report submission, tracking, confirmation
-│   ├── admin.py               # dashboard, pipeline actions, rejection
-│   └── api.py                 # map GeoJSON-ish feed, status polling
+│   ├── auth.py
+│   ├── reports.py
+│   ├── admin.py
+│   └── api.py
+│
 ├── services/
-│   ├── duplicate_detection.py # radius + type based duplicate merging
-│   ├── priority.py            # severity + duplicates + age -> priority score
-│   └── ai_suggestion.py        # optional OpenCV-based damage suggestion
-├── utils/
-│   ├── geo.py                  # haversine distance
-│   └── decorators.py            # @login_required, @roles_required
-├── templates/                   # Jinja2 + Bootstrap 5 templates
-├── static/css, static/js, static/images/
-├── database/schema.sql           # schema reference (auto-applied on first run)
-├── tests/test_basic.py            # pytest suite (auth, submission, duplicates, RBAC)
-└── Dockerfile
+│   ├── ai.py
+│   ├── duplicate.py
+│   └── priority.py
+│
+├── templates/
+│   ├── base.html
+│   ├── login.html
+│   ├── signup.html
+│   ├── map.html
+│   ├── report_form.html
+│   ├── my_reports.html
+│   └── admin/
+│
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   │
+│   ├── js/
+│   │   └── app.js
+│   │
+│   └── uploads/
+│
+└── tests/
+    └── ...
 ```
 
-## Software engineering concepts demonstrated
+---
 
-OOP-ish service layer separation, MVC-style structure (routes / models / templates),
-a small REST-ish JSON API, session-based authentication, role-based access control
-(citizen / officer / admin), a normalized relational schema with foreign keys,
-server-side input validation, exception handling (e.g. AI-assist never breaks
-submission), automated tests, Docker packaging, and a status-history audit log.
+# 🚀 Getting Started
 
-## Running locally
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/DulanMadhukaWeerathunga2000/RoadFix-LK.git
+```
+
+Go to the project directory:
+
+```bash
+cd RoadFix-LK
+```
+
+---
+
+## 2. Create a Virtual Environment
+
+Windows:
+
+```bash
+python -m venv venv
+```
+
+Activate it:
+
+```bash
+venv\Scripts\activate
+```
+
+---
+
+## 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
+```
+
+---
+
+## 4. Run the Application
+
+```bash
 python app.py
-# -> http://localhost:5000
 ```
 
-The database and an admin account are created automatically on first run:
+The application will run locally at:
 
-- **Admin login:** `admin@roadfix.lk` / `admin123` (change this in production!)
-
-To promote a citizen to `officer` so they can be assigned repairs, update
-their role directly in the DB for now (no UI for this yet — see "Next steps"):
-
-```sql
-UPDATE users SET role = 'officer' WHERE email = 'someone@example.com';
+```text
+http://127.0.0.1:5000
 ```
 
-## Running tests
+Open the URL in your browser.
 
-```bash
-pip install pytest
-pytest tests/ -v
+---
+
+# 🔐 User Roles
+
+## Citizen
+
+Citizens can:
+
+```text
+Register
+   ↓
+Login
+   ↓
+Report Road Issue
+   ↓
+Detect Location
+   ↓
+Upload Photo
+   ↓
+Select Damage Type
+   ↓
+Select Severity
+   ↓
+Submit Report
+   ↓
+Track Report
 ```
 
-## Running with Docker
+## Administrator
 
-```bash
-docker build -t roadfix-lk .
-docker run -p 5000:5000 roadfix-lk
+Administrators can:
+
+```text
+Login
+   ↓
+View Reports
+   ↓
+Review Reports
+   ↓
+Verify Reports
+   ↓
+Assign Officer
+   ↓
+Update Status
+   ↓
+Monitor Progress
 ```
 
-## Deploying from GitHub without Docker (Render.com)
+---
 
-Render can build and run this app directly from your GitHub repo using its
-native Python runtime — no Dockerfile needed.
+# 🗺️ Road Issue Reporting Flow
 
-1. **Push this project to a new GitHub repo.**
-   ```bash
-   cd RoadFix-LK
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin https://github.com/<your-username>/roadfix-lk.git
-   git push -u origin main
-   ```
-2. **Create a Render account** at [render.com](https://render.com) and connect your GitHub account.
-3. **New → Blueprint**, pick the `roadfix-lk` repo. Render will read `render.yaml`
-   automatically and configure:
-   - Build command: `pip install -r requirements.txt`
-   - Start command: `gunicorn wsgi:app --bind 0.0.0.0:$PORT`
-   - A `SECRET_KEY` (auto-generated)
-   - A 1GB persistent disk mounted at `/var/data` for the SQLite file
-4. Click **Apply**. First deploy takes a few minutes (installing OpenCV takes
-   the longest). You'll get a live URL like `https://roadfix-lk.onrender.com`.
+```text
+User
+ │
+ ▼
+Detect Current Location
+ │
+ ▼
+Show Location on Map
+ │
+ ▼
+User Confirms / Moves Pin
+ │
+ ▼
+Upload Road Image
+ │
+ ▼
+Select Damage Type
+ │
+ ▼
+Select Severity
+ │
+ ▼
+Submit Report
+ │
+ ▼
+Database
+ │
+ ▼
+Admin Review
+ │
+ ▼
+Map Visualization
+```
 
-   No `render.yaml`? You can set this up manually instead: **New → Web Service**
-   → pick the repo → Runtime: `Python 3` → Build command `pip install -r
-   requirements.txt` → Start command `gunicorn wsgi:app --bind 0.0.0.0:$PORT`.
+---
 
-**Important caveat (free tier):** Render's free web services don't persist a
-disk unless you attach one (the `render.yaml` above does this for the
-database). Uploaded report **photos** are saved under `static/images/reports/`
-in the app's own filesystem, which is *not* on that persistent disk, so
-they'll be wiped on every redeploy/restart on the free plan. Fine for a demo;
-for production move `UPLOAD_FOLDER` onto the mounted disk (or to S3/Cloudinary)
-before relying on it.
+# 📍 Location Detection
 
-**Alternatives:** Railway and PythonAnywhere also deploy straight from GitHub
-without Docker, using the same `requirements.txt` + `gunicorn wsgi:app`
-pattern (Railway) or a WSGI file pointing at `wsgi.app` (PythonAnywhere).
+RoadFix LK uses browser-based geolocation to detect the user's current location.
 
-## Suggested next steps
+Users can also manually adjust the location by:
 
-- Admin UI for managing officer accounts and roles
-- Email/SMS notifications (currently in-app only)
-- Pagination on report lists
-- Swap SQLite → PostgreSQL and polling → Flask-SocketIO for a production deployment
-- Replace the OpenCV heuristic with a trained pothole-detection model if a
-  labelled dataset becomes available
+* Dragging the map marker
+* Clicking a location on the map
+
+This is useful when the automatically detected location is not accurate enough.
+
+---
+
+# 🚨 Severity Levels
+
+Road issues can be categorized based on their severity:
+
+| Severity    | Description                                         |
+| ----------- | --------------------------------------------------- |
+| 🔴 Critical | Dangerous road condition requiring urgent attention |
+| 🟠 High     | Serious road issue that should be addressed soon    |
+| 🟡 Medium   | Moderate road damage                                |
+| 🟢 Low      | Minor road issue                                    |
+
+---
+
+# 🗺️ Map Visualization
+
+Reported road issues are displayed on an interactive map.
+
+Different colors are used to represent the severity/status of road issues.
+
+```text
+🔴 Critical
+🟠 High
+🟡 Medium / Low
+🟢 Resolved
+```
+
+Users can click a marker to view information about the reported issue.
+
+---
+
+# 🤖 AI-Based Features
+
+RoadFix LK includes AI/image-processing related functionality to support road damage analysis.
+
+The system can be extended to detect:
+
+* Potholes
+* Road cracks
+* Surface damage
+* Other visible road defects
+
+The AI component can assist administrators by providing an initial damage classification.
+
+---
+
+# 🔄 Report Status
+
+A road report can move through different stages:
+
+```text
+New
+ ↓
+Verified
+ ↓
+Assigned
+ ↓
+In Progress
+ ↓
+Resolved
+ ↓
+Confirmed
+```
+
+This allows citizens and administrators to track the progress of reported road issues.
+
+---
+
+# 🧪 Testing
+
+The project can be tested locally using:
+
+* Manual functional testing
+* User authentication testing
+* Report submission testing
+* Location testing
+* Image upload testing
+* Map testing
+* Admin functionality testing
+* API testing
+
+---
+
+# 🔒 Security Considerations
+
+The project includes authentication and role-based access concepts.
+
+For production use, additional security improvements should be implemented, including:
+
+* Strong password hashing
+* Secure session management
+* CSRF protection
+* File upload validation
+* Input validation
+* Rate limiting
+* Secure secret keys
+* Production database configuration
+
+---
+
+# 🎯 Future Improvements
+
+Future versions of RoadFix LK can include:
+
+* 📱 Mobile application
+* 🤖 Improved AI road damage detection
+* 📊 Advanced analytics dashboard
+* 📧 Email notifications
+* 📱 SMS notifications
+* 🗺️ Advanced GIS features
+* 👮 Officer mobile interface
+* 📈 Road maintenance statistics
+* ☁️ Cloud deployment
+* 🔐 Two-factor authentication
+
+---
+
+# 🎓 Academic Project
+
+RoadFix LK was developed as a software engineering project to demonstrate the practical application of:
+
+* Web application development
+* Software engineering principles
+* Database management
+* REST API development
+* Location-based services
+* Map integration
+* Image processing
+* User authentication
+* Role-based access control
+
+---
+
+# 👨‍💻 Author
+
+**Dulan Madhuka Weerathunga**
+
+GitHub:
+
+[https://github.com/DulanMadhukaWeerathunga2000](https://github.com/DulanMadhukaWeerathunga2000)
+
+Project:
+
+[https://github.com/DulanMadhukaWeerathunga2000/RoadFix-LK](https://github.com/DulanMadhukaWeerathunga2000/RoadFix-LK)
+
+---
+
+# 📄 License
+
+This project is developed for educational and academic purposes.
+
+---
+
+## ⭐ Support
+
+If you find this project useful, consider giving the repository a ⭐ on GitHub.
+
+````
+
