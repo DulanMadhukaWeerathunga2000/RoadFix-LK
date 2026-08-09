@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Road Issue Map - RoadFix LK{% endblock %}
+{% block content %}
+<h4 class="mb-3"><i class="bi bi-map"></i> Road issues near you</h4>
+<div class="mb-2">
+  <span class="badge" style="background:#e63946;">&nbsp;</span> Critical
+  <span class="badge ms-2" style="background:#f4a261;">&nbsp;</span> High
+  <span class="badge ms-2" style="background:#e9c46a;">&nbsp;</span> Medium / Low
+  <span class="badge ms-2" style="background:#2a9d8f;">&nbsp;</span> Resolved
+</div>
+<div id="issueMap" style="height:70vh;" class="rounded border"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const map = L.map('issueMap').setView([7.8731, 80.7718], 8); // Sri Lanka centroid
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+navigator.geolocation && navigator.geolocation.getCurrentPosition(pos => {
+  map.setView([pos.coords.latitude, pos.coords.longitude], 14);
+}, () => {}, { enableHighAccuracy: true });
+
+fetch('/api/map/reports')
+  .then(r => r.json())
+  .then(features => {
+    features.forEach(f => {
+      const marker = L.circleMarker([f.lat, f.lng], {
+        radius: 8,
+        fillColor: f.color,
+        color: '#333',
+        weight: 1,
+        fillOpacity: 0.85
+      }).addTo(map);
+
+      let popup = `<strong>${f.damage_type.replace('_',' ')}</strong> (${f.severity})<br>`;
+      popup += `${f.address_hint || 'No landmark given'}<br>`;
+      popup += `<span style="text-transform:capitalize">${f.status.replace('_',' ')}</span>`;
+      if (f.duplicate_count > 0) popup += `<br><em>+${f.duplicate_count} similar reports</em>`;
+      marker.bindPopup(popup);
+    });
+  });
+</script>
+{% endblock %}

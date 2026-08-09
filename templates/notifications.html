@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Notifications - RoadFix LK{% endblock %}
+{% block content %}
+<h4 class="mb-3"><i class="bi bi-bell"></i> Notifications</h4>
+{% if not notifications %}
+  <div class="alert alert-light border">No notifications yet.</div>
+{% else %}
+<div class="list-group">
+  {% for n in notifications %}
+  <a href="{{ url_for('reports.detail', report_id=n.report_id) if n.report_id else '#' }}" class="list-group-item list-group-item-action">
+    <div class="d-flex justify-content-between">
+      <span>{{ n.message }}</span>
+      <small class="text-muted">{{ n.created_at }}</small>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

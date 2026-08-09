@@ -1,0 +1,19 @@
+body {
+  background-color: #f7f9fb;
+}
+
+.card {
+  border-radius: 0.75rem;
+}
+
+.navbar-brand {
+  letter-spacing: 0.5px;
+}
+
+#issueMap, #map-picker {
+  z-index: 0;
+}
+
+table td, table th {
+  vertical-align: middle;
+}

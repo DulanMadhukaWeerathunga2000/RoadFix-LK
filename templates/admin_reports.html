@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Manage Reports - RoadFix LK{% endblock %}
+{% block content %}
+<h4 class="mb-3"><i class="bi bi-list-check"></i> Manage Reports</h4>
+
+<div class="mb-3">
+  <a href="{{ url_for('admin.report_list') }}" class="btn btn-sm {{ 'btn-primary' if not status_filter else 'btn-outline-primary' }}">All</a>
+  {% for s in ['new','verified','assigned','under_repair','completed','resolved_confirmed','rejected'] %}
+    <a href="{{ url_for('admin.report_list', status=s) }}" class="btn btn-sm {{ 'btn-primary' if status_filter==s else 'btn-outline-primary' }}">{{ s.replace('_',' ')|title }}</a>
+  {% endfor %}
+</div>
+
+<div class="table-responsive">
+<table class="table table-hover align-middle">
+  <thead>
+    <tr>
+      <th>#</th><th>Type</th><th>Sev.</th><th>Reporter</th><th>Status</th><th>Priority</th><th>Dup.</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in reports %}
+    <tr>
+      <td><a href="{{ url_for('reports.detail', report_id=r.id) }}">{{ r.id }}</a></td>
+      <td>{{ r.damage_type.replace('_',' ')|title }}</td>
+      <td>
+        <span class="badge {% if r.severity == 'critical' %}bg-danger{% elif r.severity == 'high' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">{{ r.severity|title }}</span>
+      </td>
+      <td>{{ r.reporter_name }}</td>
+      <td>{{ r.status.replace('_',' ')|title }}</td>
+      <td>{{ r.priority_score }}</td>
+      <td>{{ r.duplicate_count }}</td>
+      <td style="min-width:220px;">
+        {% if r.status in ('new','verified','assigned','under_repair') %}
+          <form method="POST" action="{{ url_for('admin.advance_status', report_id=r.id) }}" class="d-flex gap-1">
+            {% if r.status == 'verified' %}
+              <select name="officer_id" class="form-select form-select-sm" required>
+                <option value="" disabled selected>Assign officer…</option>
+                {% for o in officers %}
+                  <option value="{{ o.id }}">{{ o.full_name }}</option>
+                {% endfor %}
+              </select>
+            {% endif %}
+            <button class="btn btn-sm btn-success" type="submit">
+              {% if r.status == 'new' %}Verify
+              {% elif r.status == 'verified' %}Assign
+              {% elif r.status == 'assigned' %}Start repair
+              {% elif r.status == 'under_repair' %}Mark completed
+              {% endif %}
+            </button>
+          </form>
+          {% if r.status == 'new' %}
+          <form method="POST" action="{{ url_for('admin.reject_report', report_id=r.id) }}" class="mt-1">
+            <input type="text" name="reason" class="form-control form-control-sm mb-1" placeholder="Rejection reason">
+            <button class="btn btn-sm btn-outline-danger" type="submit">Reject</button>
+          </form>
+          {% endif %}
+        {% else %}
+          <span class="text-muted small">No action needed</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

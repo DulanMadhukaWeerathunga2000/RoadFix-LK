@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+database/roadfix.db
+static/images/reports/*
+!static/images/reports/.gitkeep
+.env

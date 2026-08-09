@@ -1,0 +1,19 @@
+# Render "Blueprint" - lets you deploy straight from GitHub with one click,
+# no Dockerfile needed (Render's native Python runtime is used instead).
+# On render.com: New -> Blueprint -> pick this repo -> Apply.
+services:
+  - type: web
+    name: roadfix-lk
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn wsgi:app --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_PATH
+        value: /var/data/roadfix.db
+    disk:
+      name: roadfix-data
+      mountPath: /var/data
+      sizeGB: 1

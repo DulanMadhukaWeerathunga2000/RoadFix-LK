@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Report Road Damage - RoadFix LK{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <h4 class="mb-3"><i class="bi bi-cone-striped"></i> Report a road problem</h4>
+    <form method="POST" enctype="multipart/form-data" id="reportForm">
+
+      <div class="mb-3">
+        <label class="form-label">📍 Location</label>
+        <div id="locStatus" class="form-text mb-1">Requesting your current location…</div>
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="getLocation()">
+          <i class="bi bi-geo-alt"></i> Re-detect location
+        </button>
+        <div id="map-picker" style="height:250px;" class="mt-2 rounded border"></div>
+        <div class="form-text">Drag the marker if the pin isn't exactly on the problem.</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Nearby landmark / area name (optional)</label>
+        <input type="text" name="address_hint" class="form-control" placeholder="e.g. Galle Road, near Bambalapitiya junction">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">📸 Photo (optional, helps verification)</label>
+        <input type="file" name="photo" accept="image/*" capture="environment" class="form-control">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">🛣️ Damage type</label>
+        <select name="damage_type" class="form-select" required>
+          <option value="" disabled selected>Select type</option>
+          {% for value, label in damage_types %}
+            <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">🚨 Severity</label>
+        <div class="btn-group w-100" role="group">
+          {% for value, label in severities %}
+          <input type="radio" class="btn-check" name="severity" id="sev-{{ value }}" value="{{ value }}" required>
+          <label class="btn btn-outline-danger" for="sev-{{ value }}">{{ label }}</label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">📝 Description</label>
+        <textarea name="description" class="form-control" rows="3" placeholder="Describe the issue (size, how long it's been there, any hazard it poses)"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100" id="submitBtn">Submit report</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let marker, map;
+
+function initPickerMap(lat, lng) {
+  map = L.map('map-picker').setView([lat, lng], 17);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+  marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+  marker.on('dragend', function () {
+    const pos = marker.getLatLng();
+    document.getElementById('latitude').value = pos.lat;
+    document.getElementById('longitude').value = pos.lng;
+  });
+}
+
+function getLocation() {
+  const statusEl = document.getElementById('locStatus');
+  if (!navigator.geolocation) {
+    statusEl.textContent = "Geolocation not supported - please tap the map to set your location manually.";
+    initPickerMap(6.9271, 79.8612); // fallback: Colombo
+    map.on('click', e => {
+      marker.setLatLng(e.latlng);
+      document.getElementById('latitude').value = e.latlng.lat;
+      document.getElementById('longitude').value = e.latlng.lng;
+    });
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude, longitude } = pos.coords;
+      document.getElementById('latitude').value = latitude;
+      document.getElementById('longitude').value = longitude;
+      statusEl.textContent = `Location detected (±${Math.round(pos.coords.accuracy)}m accuracy).`;
+      if (!map) {
+        initPickerMap(latitude, longitude);
+      } else {
+        marker.setLatLng([latitude, longitude]);
+        map.setView([latitude, longitude], 17);
+      }
+    },
+    err => {
+      statusEl.textContent = "Couldn't get your location automatically - tap the map to set it.";
+      if (!map) {
+        initPickerMap(6.9271, 79.8612);
+        map.on('click', e => {
+          marker.setLatLng(e.latlng);
+          document.getElementById('latitude').value = e.latlng.lat;
+          document.getElementById('longitude').value = e.latlng.lng;
+        });
+      }
+    },
+    { enableHighAccuracy: true }
+  );
+}
+
+document.getElementById('reportForm').addEventListener('submit', function (e) {
+  if (!document.getElementById('latitude').value) {
+    e.preventDefault();
+    alert('Please set a location before submitting (allow location access or tap the map).');
+  }
+});
+
+getLocation();
+</script>
+{% endblock %}
