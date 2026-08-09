@@ -1,128 +1,660 @@
 {% extends "base.html" %}
-{% block title %}Report Road Damage - RoadFix LK{% endblock %}
-{% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-7">
-    <h4 class="mb-3"><i class="bi bi-cone-striped"></i> Report a road problem</h4>
-    <form method="POST" enctype="multipart/form-data" id="reportForm">
 
-      <div class="mb-3">
-        <label class="form-label">📍 Location</label>
-        <div id="locStatus" class="form-text mb-1">Requesting your current location…</div>
-        <input type="hidden" name="latitude" id="latitude">
-        <input type="hidden" name="longitude" id="longitude">
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="getLocation()">
-          <i class="bi bi-geo-alt"></i> Re-detect location
-        </button>
-        <div id="map-picker" style="height:250px;" class="mt-2 rounded border"></div>
-        <div class="form-text">Drag the marker if the pin isn't exactly on the problem.</div>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Nearby landmark / area name (optional)</label>
-        <input type="text" name="address_hint" class="form-control" placeholder="e.g. Galle Road, near Bambalapitiya junction">
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">📸 Photo (optional, helps verification)</label>
-        <input type="file" name="photo" accept="image/*" capture="environment" class="form-control">
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">🛣️ Damage type</label>
-        <select name="damage_type" class="form-select" required>
-          <option value="" disabled selected>Select type</option>
-          {% for value, label in damage_types %}
-            <option value="{{ value }}">{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">🚨 Severity</label>
-        <div class="btn-group w-100" role="group">
-          {% for value, label in severities %}
-          <input type="radio" class="btn-check" name="severity" id="sev-{{ value }}" value="{{ value }}" required>
-          <label class="btn btn-outline-danger" for="sev-{{ value }}">{{ label }}</label>
-          {% endfor %}
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">📝 Description</label>
-        <textarea name="description" class="form-control" rows="3" placeholder="Describe the issue (size, how long it's been there, any hazard it poses)"></textarea>
-      </div>
-
-      <button type="submit" class="btn btn-primary w-100" id="submitBtn">Submit report</button>
-    </form>
-  </div>
-</div>
+{% block title %}
+Report Road Damage - RoadFix LK
 {% endblock %}
 
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+  <div class="col-md-7">
+
+    <h4 class="mb-3">
+      🚧 Report a road problem
+    </h4>
+
+
+    <form method="POST" enctype="multipart/form-data" id="reportForm">
+
+      <!-- =========================
+                 LOCATION
+            ========================== -->
+
+      <div class="mb-3">
+
+        <label class="form-label">
+          📍 Location
+        </label>
+
+
+        <div id="locStatus" class="form-text mb-2">
+          Detecting your location...
+        </div>
+
+
+        <!-- Hidden GPS values -->
+
+        <input type="hidden" name="latitude" id="latitude">
+
+        <input type="hidden" name="longitude" id="longitude">
+
+
+        <!-- Re-detect button -->
+
+        <button type="button" class="btn btn-sm btn-outline-primary" onclick="getLocation()">
+          📍 Re-detect location
+        </button>
+
+
+        <!-- Map -->
+
+        <div id="map-picker" style="
+                        height:300px;
+                        width:100%;
+                    " class="mt-2 rounded border">
+        </div>
+
+
+        <div class="form-text">
+
+          The pin is automatically placed
+          at your current location.
+
+          <br>
+
+          If the location is not exact,
+          drag the pin to the road problem.
+
+        </div>
+
+      </div>
+
+
+      <!-- =========================
+                 LANDMARK
+            ========================== -->
+
+      <div class="mb-3">
+
+        <label class="form-label">
+          Nearby landmark / area name
+          (optional)
+        </label>
+
+        <input type="text" name="address_hint" class="form-control"
+          placeholder="e.g. Galle Road, near Bambalapitiya junction">
+
+      </div>
+
+
+      <!-- =========================
+                 PHOTO
+            ========================== -->
+
+      <div class="mb-3">
+
+        <label class="form-label">
+          📸 Photo
+        </label>
+
+        <input type="file" name="photo" accept="image/*" capture="environment" class="form-control">
+
+      </div>
+
+
+      <!-- =========================
+                 DAMAGE TYPE
+            ========================== -->
+
+      <div class="mb-3">
+
+        <label class="form-label">
+          🛣️ Damage type
+        </label>
+
+        <select name="damage_type" class="form-select" required>
+
+          <option value="" disabled selected>
+            Select type
+          </option>
+
+
+          {% for value, label in damage_types %}
+
+          <option value="{{ value }}">
+            {{ label }}
+          </option>
+
+          {% endfor %}
+
+        </select>
+
+      </div>
+
+
+      <!-- =========================
+                 SEVERITY
+            ========================== -->
+
+      <div class="mb-3">
+
+        <label class="form-label">
+          🚨 Severity
+        </label>
+
+
+        <div class="btn-group w-100" role="group">
+
+          {% for value, label in severities %}
+
+          <input type="radio" class="btn-check" name="severity" id="sev-{{ value }}" value="{{ value }}" required>
+
+          <label class="btn btn-outline-danger" for="sev-{{ value }}">
+            {{ label }}
+          </label>
+
+          {% endfor %}
+
+        </div>
+
+      </div>
+
+
+      <!-- =========================
+                 DESCRIPTION
+            ========================== -->
+
+      <div class="mb-3">
+
+        <label class="form-label">
+          📝 Description
+        </label>
+
+        <textarea name="description" class="form-control" rows="3"
+          placeholder="Describe the road problem..."></textarea>
+
+      </div>
+
+
+      <!-- =========================
+                 SUBMIT
+            ========================== -->
+
+      <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+        Submit report
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+
+
 {% block scripts %}
+
 <script>
-let marker, map;
 
-function initPickerMap(lat, lng) {
-  map = L.map('map-picker').setView([lat, lng], 17);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-  marker = L.marker([lat, lng], { draggable: true }).addTo(map);
-  marker.on('dragend', function () {
-    const pos = marker.getLatLng();
-    document.getElementById('latitude').value = pos.lat;
-    document.getElementById('longitude').value = pos.lng;
-  });
-}
+  let map = null;
+  let marker = null;
+  let accuracyCircle = null;
 
-function getLocation() {
-  const statusEl = document.getElementById('locStatus');
-  if (!navigator.geolocation) {
-    statusEl.textContent = "Geolocation not supported - please tap the map to set your location manually.";
-    initPickerMap(6.9271, 79.8612); // fallback: Colombo
-    map.on('click', e => {
-      marker.setLatLng(e.latlng);
-      document.getElementById('latitude').value = e.latlng.lat;
-      document.getElementById('longitude').value = e.latlng.lng;
-    });
-    return;
+
+  /* ==========================================
+     INITIALIZE MAP
+  ========================================== */
+
+  function initMap(latitude, longitude) {
+
+    /*
+       Create map only once
+    */
+
+    if (map === null) {
+
+      map = L.map(
+        "map-picker"
+      ).setView(
+        [latitude, longitude],
+        17
+      );
+
+
+      /*
+         OpenStreetMap
+      */
+
+      L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          maxZoom: 19,
+
+          attribution:
+            "&copy; OpenStreetMap contributors"
+        }
+      ).addTo(map);
+
+
+      /*
+         Create draggable marker
+      */
+
+      marker = L.marker(
+        [latitude, longitude],
+        {
+          draggable: true
+        }
+      ).addTo(map);
+
+
+      /*
+         When user moves pin
+      */
+
+      marker.on(
+        "dragend",
+        function () {
+
+          const position =
+            marker.getLatLng();
+
+
+          setCoordinates(
+            position.lat,
+            position.lng
+          );
+
+
+          document.getElementById(
+            "locStatus"
+          ).innerHTML =
+            "📍 Location manually selected.";
+
+        }
+      );
+
+
+      /*
+         Allow user to click map
+      */
+
+      map.on(
+        "click",
+        function (event) {
+
+          marker.setLatLng(
+            event.latlng
+          );
+
+
+          setCoordinates(
+            event.latlng.lat,
+            event.latlng.lng
+          );
+
+
+          document.getElementById(
+            "locStatus"
+          ).innerHTML =
+            "📍 Location manually selected.";
+
+        }
+      );
+
+    }
+
+    else {
+
+      /*
+         Move existing marker
+      */
+
+      marker.setLatLng(
+        [latitude, longitude]
+      );
+
+
+      map.setView(
+        [latitude, longitude],
+        17
+      );
+
+    }
+
   }
-  navigator.geolocation.getCurrentPosition(
-    pos => {
-      const { latitude, longitude } = pos.coords;
-      document.getElementById('latitude').value = latitude;
-      document.getElementById('longitude').value = longitude;
-      statusEl.textContent = `Location detected (±${Math.round(pos.coords.accuracy)}m accuracy).`;
-      if (!map) {
-        initPickerMap(latitude, longitude);
-      } else {
-        marker.setLatLng([latitude, longitude]);
-        map.setView([latitude, longitude], 17);
+
+
+  /* ==========================================
+     SET LATITUDE / LONGITUDE
+  ========================================== */
+
+  function setCoordinates(
+    latitude,
+    longitude
+  ) {
+
+    document.getElementById(
+      "latitude"
+    ).value = latitude;
+
+
+    document.getElementById(
+      "longitude"
+    ).value = longitude;
+
+
+    console.log(
+      "Latitude:",
+      latitude
+    );
+
+
+    console.log(
+      "Longitude:",
+      longitude
+    );
+
+  }
+
+
+  /* ==========================================
+     GET CURRENT LOCATION
+  ========================================== */
+
+  function getLocation() {
+
+    const status =
+      document.getElementById(
+        "locStatus"
+      );
+
+
+    status.innerHTML =
+      "📍 Detecting your current location...";
+
+
+    /*
+       Browser doesn't support GPS
+    */
+
+    if (!navigator.geolocation) {
+
+      status.innerHTML =
+        `
+            <span class="text-danger">
+                Location is not supported
+                by this browser.
+            </span>
+            `;
+
+      return;
+
+    }
+
+
+    /*
+       Ask browser for GPS
+    */
+
+    navigator.geolocation.getCurrentPosition(
+
+      function (position) {
+
+        const latitude =
+          position.coords.latitude;
+
+
+        const longitude =
+          position.coords.longitude;
+
+
+        const accuracy =
+          position.coords.accuracy;
+
+
+        console.log(
+          "GPS Latitude:",
+          latitude
+        );
+
+
+        console.log(
+          "GPS Longitude:",
+          longitude
+        );
+
+
+        console.log(
+          "GPS Accuracy:",
+          accuracy,
+          "meters"
+        );
+
+
+        /*
+           Save coordinates
+        */
+
+        setCoordinates(
+          latitude,
+          longitude
+        );
+
+
+        /*
+           Create / move map
+        */
+
+        initMap(
+          latitude,
+          longitude
+        );
+
+
+        /*
+           Remove old accuracy circle
+        */
+
+        if (
+          accuracyCircle !== null
+        ) {
+
+          map.removeLayer(
+            accuracyCircle
+          );
+
+        }
+
+
+        /*
+           Show GPS accuracy
+        */
+
+        accuracyCircle =
+          L.circle(
+            [
+              latitude,
+              longitude
+            ],
+            {
+              radius: accuracy,
+
+              color: "#0d6efd",
+
+              fillColor: "#0d6efd",
+
+              fillOpacity: 0.10
+            }
+          ).addTo(map);
+
+
+        /*
+           Accuracy message
+        */
+
+        if (
+          accuracy <= 50
+        ) {
+
+          status.innerHTML =
+            `
+                    <span class="text-success">
+                        ✅ Location detected
+                        (±${Math.round(accuracy)}m)
+                    </span>
+                    `;
+
+        }
+
+        else if (
+          accuracy <= 200
+        ) {
+
+          status.innerHTML =
+            `
+                    <span class="text-warning">
+                        ⚠️ Location detected
+                        (±${Math.round(accuracy)}m)
+                    </span>
+                    `;
+
+        }
+
+        else {
+
+          status.innerHTML =
+            `
+                    <span class="text-danger">
+                        ⚠️ Location detected,
+                        but accuracy is low
+                        (±${Math.round(accuracy)}m).
+                        Please drag the pin
+                        to the correct road.
+                    </span>
+                    `;
+
+        }
+
+      },
+
+
+      function (error) {
+
+        console.error(
+          "Location error:",
+          error
+        );
+
+
+        status.innerHTML =
+          `
+                <span class="text-danger">
+                    ❌ Could not detect your location.
+                    Please allow location permission
+                    or select the location manually.
+                </span>
+                `;
+
+
+        /*
+           Show Colombo fallback
+        */
+
+        if (map === null) {
+
+          initMap(
+            6.9271,
+            79.8612
+          );
+
+        }
+
+      },
+
+
+      {
+        /*
+           IMPORTANT
+        */
+
+        enableHighAccuracy: true,
+
+        timeout: 30000,
+
+        maximumAge: 0
+
       }
-    },
-    err => {
-      statusEl.textContent = "Couldn't get your location automatically - tap the map to set it.";
-      if (!map) {
-        initPickerMap(6.9271, 79.8612);
-        map.on('click', e => {
-          marker.setLatLng(e.latlng);
-          document.getElementById('latitude').value = e.latlng.lat;
-          document.getElementById('longitude').value = e.latlng.lng;
-        });
+
+    );
+
+  }
+
+
+  /* ==========================================
+     FORM SUBMIT
+  ========================================== */
+
+  document
+    .getElementById("reportForm")
+    .addEventListener(
+      "submit",
+      function (event) {
+
+        const latitude =
+          document.getElementById(
+            "latitude"
+          ).value;
+
+
+        const longitude =
+          document.getElementById(
+            "longitude"
+          ).value;
+
+
+        /*
+           Location required
+        */
+
+        if (
+          !latitude ||
+          !longitude
+        ) {
+
+          event.preventDefault();
+
+
+          alert(
+            "Please allow location access or select the location on the map."
+          );
+
+
+          return;
+
+        }
+
       }
-    },
-    { enableHighAccuracy: true }
+    );
+
+
+  /* ==========================================
+     START AUTOMATIC LOCATION
+  ========================================== */
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+      getLocation();
+
+    }
   );
-}
 
-document.getElementById('reportForm').addEventListener('submit', function (e) {
-  if (!document.getElementById('latitude').value) {
-    e.preventDefault();
-    alert('Please set a location before submitting (allow location access or tap the map).');
-  }
-});
-
-getLocation();
 </script>
+
 {% endblock %}

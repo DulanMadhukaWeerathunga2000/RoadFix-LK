@@ -1,45 +1,395 @@
 {% extends "base.html" %}
-{% block title %}Road Issue Map - RoadFix LK{% endblock %}
-{% block content %}
-<h4 class="mb-3"><i class="bi bi-map"></i> Road issues near you</h4>
-<div class="mb-2">
-  <span class="badge" style="background:#e63946;">&nbsp;</span> Critical
-  <span class="badge ms-2" style="background:#f4a261;">&nbsp;</span> High
-  <span class="badge ms-2" style="background:#e9c46a;">&nbsp;</span> Medium / Low
-  <span class="badge ms-2" style="background:#2a9d8f;">&nbsp;</span> Resolved
-</div>
-<div id="issueMap" style="height:70vh;" class="rounded border"></div>
+
+{% block title %}
+Road Issue Map - RoadFix LK
 {% endblock %}
 
+
+{% block content %}
+
+<div class="container-fluid">
+
+  <h4 class="mb-3">
+    <i class="bi bi-map"></i>
+    Road issues near you
+  </h4>
+
+
+  <!-- Legend -->
+  <div class="mb-3">
+
+    <span class="badge" style="background:#e63946;">
+      &nbsp;
+    </span>
+    Critical
+
+    <span class="badge ms-3" style="background:#f4a261;">
+      &nbsp;
+    </span>
+    High
+
+    <span class="badge ms-3" style="background:#e9c46a;">
+      &nbsp;
+    </span>
+    Medium / Low
+
+    <span class="badge ms-3" style="background:#2a9d8f;">
+      &nbsp;
+    </span>
+    Resolved
+
+  </div>
+
+
+  <!-- Map -->
+  <div id="issueMap" style="height:70vh; width:100%;" class="rounded border">
+  </div>
+
+
+  <!-- Map status -->
+  <div id="mapStatus" class="mt-2 text-muted">
+    Loading road reports...
+  </div>
+
+</div>
+
+{% endblock %}
+
+
+
 {% block scripts %}
+
 <script>
-const map = L.map('issueMap').setView([7.8731, 80.7718], 8); // Sri Lanka centroid
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
 
-navigator.geolocation && navigator.geolocation.getCurrentPosition(pos => {
-  map.setView([pos.coords.latitude, pos.coords.longitude], 14);
-}, () => {}, { enableHighAccuracy: true });
+  document.addEventListener("DOMContentLoaded", function () {
 
-fetch('/api/map/reports')
-  .then(r => r.json())
-  .then(features => {
-    features.forEach(f => {
-      const marker = L.circleMarker([f.lat, f.lng], {
-        radius: 8,
-        fillColor: f.color,
-        color: '#333',
-        weight: 1,
-        fillOpacity: 0.85
-      }).addTo(map);
+    console.log("RoadFix LK map starting...");
 
-      let popup = `<strong>${f.damage_type.replace('_',' ')}</strong> (${f.severity})<br>`;
-      popup += `${f.address_hint || 'No landmark given'}<br>`;
-      popup += `<span style="text-transform:capitalize">${f.status.replace('_',' ')}</span>`;
-      if (f.duplicate_count > 0) popup += `<br><em>+${f.duplicate_count} similar reports</em>`;
-      marker.bindPopup(popup);
-    });
+
+    // ------------------------------------------------
+    // Create map
+    // ------------------------------------------------
+
+    const map = L.map("issueMap").setView(
+      [7.8731, 80.7718],
+      8
+    );
+
+
+    // ------------------------------------------------
+    // OpenStreetMap
+    // ------------------------------------------------
+
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        maxZoom: 19,
+        attribution:
+          "&copy; OpenStreetMap contributors"
+      }
+    ).addTo(map);
+
+
+    // ------------------------------------------------
+    // Layer for reports
+    // ------------------------------------------------
+
+    const reportLayer = L.layerGroup().addTo(map);
+
+
+    // ------------------------------------------------
+    // Load reports
+    // ------------------------------------------------
+
+    fetch("/api/map/reports", {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      }
+    })
+
+      .then(function (response) {
+
+        console.log(
+          "API status:",
+          response.status
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "API returned HTTP " +
+            response.status
+          );
+        }
+
+        return response.json();
+      })
+
+
+      .then(function (reports) {
+
+        console.log(
+          "Reports received:",
+          reports
+        );
+
+
+        const status =
+          document.getElementById("mapStatus");
+
+
+        // No reports
+        if (!Array.isArray(reports) ||
+          reports.length === 0) {
+
+          status.innerHTML =
+            "No road issues have been reported yet.";
+
+          return;
+        }
+
+
+        let validMarkers = 0;
+
+
+        // ------------------------------------------------
+        // Create markers
+        // ------------------------------------------------
+
+        reports.forEach(function (report) {
+
+          const lat =
+            Number(report.lat);
+
+          const lng =
+            Number(report.lng);
+
+
+          // Validate coordinates
+          if (
+            !Number.isFinite(lat) ||
+            !Number.isFinite(lng) ||
+            lat < -90 ||
+            lat > 90 ||
+            lng < -180 ||
+            lng > 180
+          ) {
+
+            console.warn(
+              "Invalid coordinates:",
+              report
+            );
+
+            return;
+          }
+
+
+          validMarkers++;
+
+
+          // ------------------------------------------------
+          // Marker
+          // ------------------------------------------------
+
+          const marker =
+            L.circleMarker(
+              [lat, lng],
+              {
+                radius: 9,
+
+                fillColor:
+                  report.color ||
+                  "#e9c46a",
+
+                color: "#333",
+
+                weight: 1,
+
+                opacity: 1,
+
+                fillOpacity: 0.9
+              }
+            );
+
+
+          marker.addTo(reportLayer);
+
+
+          // ------------------------------------------------
+          // Format text
+          // ------------------------------------------------
+
+          const damage =
+            String(
+              report.damage_type ||
+              "Road issue"
+            )
+              .replace(/_/g, " ");
+
+
+          const severity =
+            String(
+              report.severity ||
+              "unknown"
+            );
+
+
+          const currentStatus =
+            String(
+              report.status ||
+              "unknown"
+            )
+              .replace(/_/g, " ");
+
+
+          const address =
+            report.address_hint ||
+            "No landmark provided";
+
+
+          const duplicateCount =
+            Number(
+              report.duplicate_count || 0
+            );
+
+
+          // ------------------------------------------------
+          // Popup
+          // ------------------------------------------------
+
+          let popup = `
+                <div style="min-width:220px">
+
+                    <h6>
+                        <strong>
+                            ${damage}
+                        </strong>
+                    </h6>
+
+                    <p class="mb-1">
+                        <strong>Severity:</strong>
+                        ${severity}
+                    </p>
+
+                    <p class="mb-1">
+                        <strong>Status:</strong>
+                        ${currentStatus}
+                    </p>
+
+                    <p class="mb-1">
+                        <strong>Location:</strong>
+                        ${address}
+                    </p>
+
+                    <p class="mb-1">
+                        <strong>Coordinates:</strong><br>
+                        ${lat.toFixed(6)},
+                        ${lng.toFixed(6)}
+                    </p>
+            `;
+
+
+          if (duplicateCount > 0) {
+
+            popup += `
+                    <p class="mb-0">
+                        <em>
+                            +${duplicateCount}
+                            similar reports
+                        </em>
+                    </p>
+                `;
+          }
+
+
+          popup += `
+                </div>
+            `;
+
+
+          marker.bindPopup(popup);
+
+
+          // Click event
+          marker.on(
+            "click",
+            function () {
+
+              console.log(
+                "Marker clicked:",
+                report
+              );
+
+            }
+          );
+
+        });
+
+
+        // ------------------------------------------------
+        // Map status
+        // ------------------------------------------------
+
+        if (validMarkers > 0) {
+
+          status.innerHTML =
+            validMarkers +
+            " road issue(s) found on the map.";
+
+
+          // Fit map to markers
+          const bounds =
+            reportLayer.getBounds();
+
+
+          if (bounds.isValid()) {
+
+            map.fitBounds(
+              bounds,
+              {
+                padding: [40, 40],
+
+                maxZoom: 15
+              }
+            );
+          }
+
+        } else {
+
+          status.innerHTML =
+            "Reports were found, but no valid GPS coordinates were available.";
+
+        }
+
+      })
+
+
+      // ------------------------------------------------
+      // API error
+      // ------------------------------------------------
+
+      .catch(function (error) {
+
+        console.error(
+          "Map API error:",
+          error
+        );
+
+
+        document.getElementById(
+          "mapStatus"
+        ).innerHTML =
+
+          `<span class="text-danger">
+                Unable to load road reports.
+                Please check the server console.
+            </span>`;
+
+      });
+
+
   });
+
 </script>
+
 {% endblock %}
