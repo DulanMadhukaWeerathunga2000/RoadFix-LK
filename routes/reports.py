@@ -111,21 +111,23 @@ def new_report():
             return redirect(url_for("reports.my_reports"))
 
         # --- Optional AI suggestion (advisory only, doesn't override user's choice) ---
-        ai_type, ai_severity = None, None
+        ai_type, ai_severity, ai_reasoning = None, None, None
         if image_path:
             suggestion = suggest_from_image(
                 os.path.join(current_app.config["UPLOAD_FOLDER"], os.path.basename(image_path))
             )
             if suggestion:
-                ai_type, ai_severity = suggestion["damage_type"], suggestion["severity"]
+                ai_type = suggestion["damage_type"]
+                ai_severity = suggestion["severity"]
+                ai_reasoning = suggestion.get("ai_reasoning")
 
         report_id = execute(
             """INSERT INTO reports
                (user_id, damage_type, description, severity, latitude, longitude,
-                address_hint, image_path, status, ai_suggested_type, ai_suggested_severity)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?)""",
+                address_hint, image_path, status, ai_suggested_type, ai_suggested_severity, ai_reasoning)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?)""",
             (session["user_id"], damage_type, description, severity, latitude, longitude,
-             address_hint, image_path, ai_type, ai_severity),
+             address_hint, image_path, ai_type, ai_severity, ai_reasoning),
         )
         recalculate_priority(report_id)
         flash("Report submitted. Thank you for helping improve our roads!", "success")

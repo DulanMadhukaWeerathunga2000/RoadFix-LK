@@ -1,63 +1,117 @@
 {% extends "base.html" %}
 {% block title %}Report #{{ report.id }} - RoadFix LK{% endblock %}
 {% block content %}
-<div class="row">
-  <div class="col-md-7">
-    <h4>Report #{{ report.id }} &mdash; {{ report.damage_type.replace('_',' ')|title }}</h4>
-    <p class="text-muted">{{ report.address_hint or "No landmark provided" }}</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0 fw-bold" style="color: var(--secondary-color);">Report #{{ report.id }} &mdash; {{ report.damage_type.replace('_',' ')|title }}</h4>
+  <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm rounded-pill px-3">&larr; Back</a>
+</div>
 
+<div class="row g-4 mb-5">
+  <div class="col-lg-7">
+    <!-- Image Card -->
     {% if report.image_path %}
-      <img src="{{ url_for('static', filename=report.image_path) }}" class="img-fluid rounded mb-3" style="max-height:350px;">
+    <div class="card border-0 shadow-sm mb-4 overflow-hidden rounded-4">
+      <img src="{{ url_for('static', filename=report.image_path) }}" class="w-100" style="max-height: 400px; object-fit: cover;" alt="Damage Photo">
+    </div>
     {% endif %}
 
-    <p>{{ report.description or "No description provided." }}</p>
+    <!-- Details Card -->
+    <div class="card border-0 shadow-sm mb-4 rounded-4">
+      <div class="card-body p-4">
+        <h5 class="fw-bold mb-3">Report Details</h5>
+        <p class="text-muted mb-2"><i class="bi bi-geo-alt-fill me-2 text-danger"></i>{{ report.address_hint or "No landmark provided" }}</p>
+        <p class="mb-4 text-dark"><i class="bi bi-justify-left me-2 text-primary"></i>{{ report.description or "No description provided." }}</p>
 
-    <ul class="list-group mb-3">
-      <li class="list-group-item d-flex justify-content-between">
-        <span>Severity</span><strong>{{ report.severity|title }}</strong>
-      </li>
-      <li class="list-group-item d-flex justify-content-between">
-        <span>Status</span>
-        <strong id="statusLabel">{{ status_labels.get(report.status, report.status) }}</strong>
-      </li>
-      {% if report.duplicate_count %}
-      <li class="list-group-item d-flex justify-content-between">
-        <span>Also reported by</span><strong>{{ report.duplicate_count }} other citizen(s)</strong>
-      </li>
-      {% endif %}
-      {% if report.ai_suggested_type %}
-      <li class="list-group-item">
-        <span class="text-muted">AI suggested (unverified):</span>
-        {{ report.ai_suggested_type|title }} / {{ report.ai_suggested_severity|title }}
-      </li>
-      {% endif %}
-    </ul>
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="p-3 bg-light rounded-3 text-center border">
+              <div class="text-muted small fw-medium text-uppercase mb-1">Severity</div>
+              <div class="fw-bold fs-5 text-{{ 'danger' if report.severity == 'critical' else 'warning' if report.severity == 'high' else 'info' if report.severity == 'medium' else 'secondary' }}">{{ report.severity|title }}</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-3 bg-light rounded-3 text-center border">
+              <div class="text-muted small fw-medium text-uppercase mb-1">Status</div>
+              <div class="fw-bold fs-5 text-dark" id="statusLabel">{{ status_labels.get(report.status, report.status) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    {% if report.status == 'completed' and report.user_id == session.get('user_id') %}
-      <form method="POST" action="{{ url_for('reports.confirm_resolved', report_id=report.id) }}">
-        <button class="btn btn-success"><i class="bi bi-check2-circle"></i> Confirm it's fixed</button>
-      </form>
+    <!-- AI Analysis Card -->
+    {% if report.ai_suggested_type %}
+    <div class="card border-0 shadow-sm mb-4 rounded-4" style="border-left: 5px solid var(--info-color) !important;">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center mb-3">
+          <div class="bg-info bg-opacity-10 text-info rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+            <i class="bi bi-robot fs-4"></i>
+          </div>
+          <h5 class="fw-bold mb-0">Gemini AI Analysis</h5>
+        </div>
+        
+        <div class="d-flex gap-3 mb-3">
+          <span class="badge bg-light text-dark border py-2 px-3"><i class="bi bi-tag me-2"></i>Predicted Type: {{ report.ai_suggested_type|title }}</span>
+          <span class="badge bg-light text-dark border py-2 px-3"><i class="bi bi-exclamation-triangle me-2"></i>Predicted Severity: {{ report.ai_suggested_severity|title }}</span>
+        </div>
+        
+        <div class="bg-light rounded p-3 text-muted fst-italic">
+          <i class="bi bi-quote fs-5 text-secondary"></i> {{ report.ai_reasoning or "Analyzed based on visual heuristics." }}
+        </div>
+      </div>
+    </div>
     {% endif %}
+
   </div>
 
-  <div class="col-md-5">
-    <h6>Status timeline</h6>
-    <ul class="list-group">
-      <li class="list-group-item"><strong>Created</strong> &mdash; {{ report.created_at }}</li>
-      {% for h in history %}
-        <li class="list-group-item">
-          <strong>{{ h.old_status or '—' }} → {{ h.new_status }}</strong><br>
-          <span class="text-muted small">{{ h.changed_at }}{% if h.note %} &mdash; {{ h.note }}{% endif %}</span>
-        </li>
-      {% endfor %}
-    </ul>
+  <div class="col-lg-5">
+    <!-- User Actions -->
+    {% if report.status == 'completed' and report.user_id == session.get('user_id') %}
+    <div class="card border-0 shadow-sm mb-4 bg-success bg-gradient text-white rounded-4 hover-lift">
+      <div class="card-body text-center p-4">
+        <h5 class="fw-bold mb-3"><i class="bi bi-patch-check fs-2 d-block mb-2"></i> Repair Completed?</h5>
+        <p class="small opacity-75 mb-4">Please confirm if the road damage has been successfully repaired.</p>
+        <form method="POST" action="{{ url_for('reports.confirm_resolved', report_id=report.id) }}">
+          <button class="btn btn-light btn-lg fw-bold rounded-pill px-4 w-100">Confirm Resolution</button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Timeline Card -->
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
+        <h6 class="fw-bold mb-0 text-secondary text-uppercase tracking-wide">Status Timeline</h6>
+      </div>
+      <div class="card-body px-4 pt-4 pb-1">
+        <div class="position-relative ps-4" style="border-left: 2px solid #e9ecef;">
+          <!-- Created Node -->
+          <div class="mb-4 position-relative">
+            <span class="position-absolute bg-primary rounded-circle shadow-sm" style="width: 14px; height: 14px; left: -32px; top: 4px; border: 2px solid white;"></span>
+            <div class="fw-bold text-dark">Report Submitted</div>
+            <div class="text-muted small">{{ report.created_at }}</div>
+          </div>
+          
+          <!-- History Nodes -->
+          {% for h in history %}
+          <div class="mb-4 position-relative">
+            <span class="position-absolute bg-secondary rounded-circle shadow-sm" style="width: 14px; height: 14px; left: -32px; top: 4px; border: 2px solid white;"></span>
+            <div class="fw-bold text-dark">{{ h.old_status or '—' }} &rarr; {{ h.new_status }}</div>
+            <div class="text-muted small mb-1">{{ h.changed_at }}</div>
+            {% if h.note %}
+            <div class="bg-light p-2 rounded small fst-italic text-muted border-start border-3 border-secondary">{{ h.note }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-// Lightweight polling to simulate real-time status updates without a websocket server
 const reportId = {{ report.id }};
 const labels = {{ status_labels | tojson }};
 setInterval(() => {

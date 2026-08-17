@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS reports (
     assigned_officer_id INTEGER REFERENCES users(id),
     ai_suggested_type     TEXT,
     ai_suggested_severity TEXT,
+    ai_reasoning          TEXT,
     created_at       TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at       TEXT NOT NULL DEFAULT (datetime('now'))
 );

@@ -1,66 +1,85 @@
 """
-Optional AI Assist
+True AI Assist (Gemini Vision)
 -------------------
-This is intentionally NOT a trained deep-learning classifier (that would need
-a labelled pothole dataset + GPU training, out of scope here). Instead it's a
-transparent, explainable OpenCV heuristic that gives the admin/user a
-*suggestion* they must still verify:
+This uses the Gemini 2.5 Flash model to act as a virtual civil engineer.
+It analyzes the uploaded image to classify the road damage, determine its 
+severity, and provide a reasoning.
 
-  - Converts the image to grayscale + edge map (Canny).
-  - Looks for a large, roughly circular/irregular dark blob near the bottom
-    two-thirds of the frame (typical pothole/crack framing when a phone is
-    held at road level).
-  - The blob's area (relative to frame) drives a severity suggestion.
-
-If OpenCV or the image can't be read, we simply return None and the user/
-admin fills the fields in manually - the AI suggestion is never final,
-per the spec ("AI decision එක final නොකර, admin/userට verify කරන්න දෙන්න").
+Requires GEMINI_API_KEY environment variable.
 """
-import cv2
-import numpy as np
-
+import os
+import json
+from google import genai
+from google.genai import types
 
 def suggest_from_image(image_path):
     try:
-        img = cv2.imread(image_path)
-        if img is None:
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            print("GEMINI_API_KEY not found, skipping AI analysis.")
             return None
 
-        h, w = img.shape[:2]
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(gray, (7, 7), 0)
-        edges = cv2.Canny(blurred, 40, 120)
+        client = genai.Client(api_key=api_key)
+        
+        # Read image file
+        with open(image_path, "rb") as f:
+            image_bytes = f.read()
 
-        contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if not contours:
-            return None
+        prompt = (
+            "You are an expert civil engineer. Analyze the road damage in this image. "
+            "Identify the damage type (choose from: pothole, crack, damaged_road, surface_damage). "
+            "Determine the severity (choose from: low, medium, high, critical). "
+            "Provide a confidence score between 0.0 and 1.0. "
+            "Also provide a short 'ai_reasoning' string explaining your severity choice based on the image."
+        )
 
-        largest = max(contours, key=cv2.contourArea)
-        area_ratio = cv2.contourArea(largest) / float(h * w)
-
-        x, y, cw, ch = cv2.boundingRect(largest)
-        aspect = cw / float(ch) if ch else 1
-
-        if area_ratio < 0.01:
-            return None  # not confident enough to suggest anything
-
-        # Rough shape heuristic: pothole ~ blobby/roundish, crack ~ long & thin
-        damage_type = "crack" if aspect > 2.5 or aspect < 0.4 else "pothole"
-
-        if area_ratio > 0.18:
-            severity = "critical"
-        elif area_ratio > 0.10:
-            severity = "high"
-        elif area_ratio > 0.04:
-            severity = "medium"
-        else:
-            severity = "low"
-
-        return {
-            "damage_type": damage_type,
-            "severity": severity,
-            "confidence": round(min(area_ratio * 4, 1.0), 2),
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=[
+                types.Part.from_bytes(data=image_bytes, mime_type='image/jpeg'),
+                prompt
+            ],
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema={
+                    "type": "OBJECT",
+                    "properties": {
+                        "damage_type": {"type": "STRING"},
+                        "severity": {"type": "STRING"},
+                        "confidence": {"type": "NUMBER"},
+                        "ai_reasoning": {"type": "STRING"}
+                    },
+                    "required": ["damage_type", "severity", "confidence", "ai_reasoning"]
+                }
+            )
+        )
+        
+        result = json.loads(response.text)
+        
+        # Ensure returned damage type and severity match our DB enums
+        damage_mapping = {
+            "pothole": "pothole",
+            "crack": "crack",
+            "damaged_road": "damaged_road",
+            "surface_damage": "surface_damage"
         }
-    except Exception:
-        # Never let AI-assist break report submission
+        
+        sev_mapping = {
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
+            "critical": "critical"
+        }
+        
+        final_type = damage_mapping.get(result.get("damage_type", "").lower(), "pothole")
+        final_sev = sev_mapping.get(result.get("severity", "").lower(), "medium")
+        
+        return {
+            "damage_type": final_type,
+            "severity": final_sev,
+            "confidence": result.get("confidence", 0.8),
+            "ai_reasoning": result.get("ai_reasoning", "Analyzed by Gemini AI.")
+        }
+    except Exception as e:
+        print(f"AI Suggestion Error: {e}")
         return None

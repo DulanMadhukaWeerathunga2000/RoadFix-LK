@@ -5,8 +5,8 @@
   <div class="col-md-5">
     <div class="card shadow-sm">
       <div class="card-body p-4">
-        <h4 class="mb-3">Create your account</h4>
-        <form method="POST">
+        <h4 class="mb-3 text-center fw-bold" style="color: var(--secondary-color);">Create your account</h4>
+        <form method="POST" id="authForm">
           <div class="mb-3">
             <label class="form-label">Full name</label>
             <input type="text" name="full_name" class="form-control" value="{{ form.get('full_name','') }}" required autofocus>
@@ -23,7 +23,10 @@
             <label class="form-label">Password</label>
             <input type="password" name="password" class="form-control" minlength="6" required>
           </div>
-          <button type="submit" class="btn btn-primary w-100">Sign up</button>
+          <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="submitBtn">
+            <span id="btnText">Sign up</span>
+            <span id="btnSpinner" class="spinner-border spinner-border-sm d-none ms-2" role="status" aria-hidden="true"></span>
+          </button>
         </form>
         <p class="mt-3 mb-0 text-muted small">
           Already have an account? <a href="{{ url_for('auth.login') }}">Login</a>
@@ -32,4 +35,17 @@
     </div>
   </div>
 </div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById("authForm").addEventListener("submit", function() {
+    const submitBtn = document.getElementById("submitBtn");
+    const btnText = document.getElementById("btnText");
+    const btnSpinner = document.getElementById("btnSpinner");
+    
+    submitBtn.disabled = true;
+    btnText.innerText = "Please wait...";
+    btnSpinner.classList.remove("d-none");
+  });
+</script>
 {% endblock %}

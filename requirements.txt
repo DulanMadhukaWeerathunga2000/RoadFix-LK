@@ -6,3 +6,5 @@ gunicorn==23.0.0
 # and the services/ai_suggestion.py import if you don't need it.
 opencv-python-headless==4.13.0.92
 numpy==2.4.4
+google-genai==0.3.0
+python-dotenv==1.0.1

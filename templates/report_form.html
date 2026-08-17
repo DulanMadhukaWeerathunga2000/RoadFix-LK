@@ -99,9 +99,12 @@ Report Road Damage - RoadFix LK
           📸 Photo
         </label>
 
-        <input type="file" name="photo" accept="image/*" capture="environment" class="form-control">
-
-      </div>
+        <input type="file" name="photo" id="photoInput" accept="image/*" capture="environment" class="form-control">
+        
+        <!-- Image Preview Container -->
+        <div id="imagePreviewContainer" class="mt-3 text-center d-none">
+          <img id="imagePreview" src="" alt="Selected Photo" class="img-fluid rounded shadow-sm" style="max-height: 200px; object-fit: cover;">
+        </div>
 
 
       <!-- =========================
@@ -182,8 +185,9 @@ Report Road Damage - RoadFix LK
                  SUBMIT
             ========================== -->
 
-      <button type="submit" class="btn btn-primary w-100" id="submitBtn">
-        Submit report
+      <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="submitBtn">
+        <span id="btnText">Submit report</span>
+        <span id="btnSpinner" class="spinner-border spinner-border-sm d-none ms-2" role="status" aria-hidden="true"></span>
       </button>
 
     </form>
@@ -638,8 +642,38 @@ Report Road Damage - RoadFix LK
 
         }
 
+        // Show loading state
+        const submitBtn = document.getElementById("submitBtn");
+        const btnText = document.getElementById("btnText");
+        const btnSpinner = document.getElementById("btnSpinner");
+        
+        submitBtn.disabled = true;
+        btnText.innerText = "Submitting...";
+        btnSpinner.classList.remove("d-none");
+
       }
     );
+
+  /* ==========================================
+     IMAGE PREVIEW
+  ========================================== */
+  document.getElementById("photoInput").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    const previewContainer = document.getElementById("imagePreviewContainer");
+    const previewImage = document.getElementById("imagePreview");
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewImage.src = e.target.result;
+        previewContainer.classList.remove("d-none");
+      }
+      reader.readAsDataURL(file);
+    } else {
+      previewImage.src = "";
+      previewContainer.classList.add("d-none");
+    }
+  });
 
 
   /* ==========================================
