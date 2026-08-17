@@ -1,207 +1,783 @@
-# 🚧 RoadFix LK
+# 🛣️ RoadFix-LK
 
-### Smart Road Damage Reporting and Management System
+## Smart Road Damage Reporting & Management System
 
-RoadFix LK is a web-based road damage reporting system designed to help citizens report road problems such as potholes, cracks, damaged roads, and other road-related issues.
+<div align="center">
 
-The system allows users to submit road damage reports with location information, photos, severity levels, and descriptions. Administrators can review and manage reported issues through the system.
+**A web-based civic technology platform for reporting, managing, tracking, and resolving road-related issues in Sri Lanka.**
 
----
+![Python](https://img.shields.io/badge/Python-3.x-blue)
+![Flask](https://img.shields.io/badge/Flask-Web%20Framework-black)
+![SQLite](https://img.shields.io/badge/Database-SQLite-blue)
+![OpenCV](https://img.shields.io/badge/Computer%20Vision-OpenCV-green)
+![Leaflet](https://img.shields.io/badge/Maps-Leaflet.js-green)
+![OpenStreetMap](https://img.shields.io/badge/Map-OpenStreetMap-orange)
+![Bootstrap](https://img.shields.io/badge/UI-Bootstrap-purple)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-## 📌 Project Overview
-
-Road damage is a common problem that can affect road safety, transportation, and daily travel.
-
-RoadFix LK provides a simple digital platform where citizens can:
-
-- 📍 Report road problems using their current location
-- 🗺️ Select the exact location using an interactive map
-- 📸 Upload photos of road damage
-- 🚧 Select the type of road damage
-- 🚨 Set the severity level
-- 📝 Add additional information
-- 📋 View submitted reports
-- 🔔 Receive notifications about report updates
-
-Administrators can manage and monitor reported road issues through the system.
+</div>
 
 ---
 
-## ✨ Features
+## 📖 Table of Contents
 
-### 👤 Citizen Features
-
-- User registration and login
-- Secure authentication
-- Report road damage
-- Automatic location detection
-- Interactive map location selection
-- Draggable map marker
-- Photo upload
-- Road damage type selection
-- Severity selection
-- Report description
-- View submitted reports
-- Track report status
-- Notifications
-
-### 🛠️ Admin Features
-
-- Admin login
-- View road damage reports
-- Review submitted reports
-- Verify reports
-- Manage report status
-- Assign reports to responsible officers
-- Monitor road issues
-- View reports on an interactive map
-
-### 🗺️ Map Features
-
-- Interactive OpenStreetMap
-- Leaflet.js map
-- Automatic location detection
-- Draggable location marker
-- Road issue markers
-- Severity-based marker colors
-- Report information popup
-- Map-based road issue visualization
-
-### 🤖 Smart Features
-
-- Duplicate report detection
-- Report priority calculation
-- AI-assisted road damage detection
-- Image-based damage analysis
+* [Project Overview](#-project-overview)
+* [Problem Statement](#-problem-statement)
+* [Objectives](#-objectives)
+* [How the System Works](#-how-the-system-works)
+* [Main Users](#-main-users)
+* [Core Features](#-core-features)
+* [System Workflow](#-system-workflow)
+* [System Architecture](#-system-architecture)
+* [Technology Stack](#-technology-stack)
+* [Project Structure](#-project-structure)
+* [Database Design](#-database-design)
+* [Main Modules](#-main-modules)
+* [API Endpoints](#-api-endpoints)
+* [Security](#-security)
+* [Screenshots](#-screenshots)
+* [Installation](#-installation)
+* [Configuration](#-configuration)
+* [Running the Application](#-running-the-application)
+* [Testing](#-testing)
+* [Future Improvements](#-future-improvements)
+* [Project Roadmap](#-project-roadmap)
+* [Future Real-Time Architecture](#-future-real-time-architecture)
+* [Contribution](#-contribution)
+* [Author](#-author)
+* [License](#-license)
 
 ---
 
-## 🛠️ Technologies Used
+# 📌 Project Overview
 
-### Frontend
+**RoadFix-LK** is a Smart Road Damage Reporting and Management System designed for Sri Lanka.
 
-- HTML5
-- CSS3
-- Bootstrap
-- JavaScript
-- Leaflet.js
+The system allows citizens to report road-related problems such as:
 
-### Backend
+* 🕳️ Potholes
+* 🛣️ Damaged roads
+* 🧱 Road cracks
+* 🌊 Flooded roads
+* 🪨 Landslides
+* 💡 Damaged street infrastructure
+* ⚠️ Other road hazards
 
-- Python
-- Flask
+Citizens can submit a report with a description, image, and geographical location.
 
-### Database
+Administrators can then review reports, verify the reported problem, update its status, and manage the repair process.
 
-- SQLite
-
-### Maps
-
-- Leaflet.js
-- OpenStreetMap
-
-### AI / Image Processing
-
-- OpenCV
-- Python
-
-### Development Tools
-
-- Visual Studio Code
-- Git
-- GitHub
+The system provides a central platform that connects **citizens and responsible authorities**.
 
 ---
 
-## 🏗️ System Architecture
+# 🚨 Problem Statement
+
+Road damage is a common problem in Sri Lanka.
+
+Citizens often report road problems through:
+
+* Phone calls
+* Social media
+* Messages
+* Informal communication
+* Personal complaints
+
+These methods can make it difficult for authorities to:
+
+* Track complaints
+* Identify exact locations
+* Prioritize serious problems
+* Avoid duplicate complaints
+* Monitor repair progress
+* Maintain historical records
+
+RoadFix-LK provides a centralized digital solution for managing these problems.
+
+---
+
+# 🎯 Objectives
+
+The main objectives of RoadFix-LK are:
+
+1. Allow citizens to report road damage easily.
+2. Capture the exact location of the reported issue.
+3. Allow users to upload images as evidence.
+4. Store reports in a centralized database.
+5. Allow administrators to review submitted reports.
+6. Categorize road damage.
+7. Prioritize serious road problems.
+8. Track report status.
+9. Display reported locations on an interactive map.
+10. Improve communication between citizens and authorities.
+11. Provide a foundation for future AI-based road damage detection.
+12. Support real-time road monitoring in future versions.
+
+---
+
+# 👥 Main Users
+
+## 👤 Citizen
+
+Citizens can:
+
+* Register an account
+* Login
+* Submit road damage reports
+* Upload images
+* Add descriptions
+* Share location
+* View submitted reports
+* Track report status
+* View road problems on a map
+
+---
+
+## 👨‍💼 Administrator
+
+Administrators can:
+
+* Login to the administration dashboard
+* View submitted reports
+* Review reports
+* Verify reports
+* Reject invalid reports
+* Change report status
+* Manage reported road issues
+* View locations on a map
+* Monitor unresolved issues
+* Manage users
+
+---
+
+# ⚡ Core Features
+
+## 1. 👤 User Registration & Login
+
+Users can create accounts and securely access the system.
+
+Features:
+
+* Registration
+* Login
+* Logout
+* Session management
+* User profile
+
+---
+
+## 2. 📝 Road Damage Reporting
+
+Citizens can create a report by entering:
+
+* Road damage type
+* Description
+* Location
+* Image
+* Date/time
+* Additional information
+
+Example:
 
 ```text
-                    ┌──────────────────────┐
-                    │       Citizen        │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │     Web Interface    │
-                    │ HTML / CSS / JS /    │
-                    │ Bootstrap / Leaflet  │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │      Flask API       │
-                    │      Backend         │
-                    └──────────┬───────────┘
-                               │
-                 ┌─────────────┼─────────────┐
-                 │             │             │
-                 ▼             ▼             ▼
-          ┌──────────┐  ┌───────────┐  ┌──────────┐
-          │  SQLite  │  │   Image   │  │   Map    │
-          │ Database │  │ Processing│  │ Services │
-          └──────────┘  └───────────┘  └──────────┘
-                 │
-                 ▼
-          ┌──────────────────┐
-          │      Admin       │
-          │    Dashboard     │
-          └──────────────────┘
----
-
+Type: Pothole
+Location: Colombo
+Description: Large pothole near the main junction.
+Severity: High
+Image: pothole.jpg
+```
 
 ---
-## 📂 Project Structure
+
+## 3. 📍 GPS Location
+
+The system can capture the geographical location of a road issue.
+
+The location can be represented using:
+
+```text
+Latitude
+Longitude
+```
+
+Example:
+
+```text
+Latitude: 6.9271
+Longitude: 79.8612
+```
+
+---
+
+## 4. 🗺️ Interactive Map
+
+Road reports can be displayed using:
+
+* Leaflet.js
+* OpenStreetMap
+
+Users can visually identify where road problems have been reported.
+
+Example:
+
+```text
+             MAP
+ ┌─────────────────────────────┐
+ │                             │
+ │       🔴 Pothole            │
+ │                             │
+ │              🟠 Crack       │
+ │                             │
+ │   🔴 Flood                  │
+ │                             │
+ └─────────────────────────────┘
+```
+
+---
+
+## 5. 📷 Image Upload
+
+Citizens can upload images of damaged roads.
+
+Images provide evidence that helps administrators verify reports.
+
+Supported formats can include:
+
+```text
+JPG
+JPEG
+PNG
+WEBP
+```
+
+---
+
+## 6. 📊 Report Status Tracking
+
+Each report can have a status.
+
+Example lifecycle:
+
+```text
+SUBMITTED
+    ↓
+UNDER REVIEW
+    ↓
+VERIFIED
+    ↓
+ASSIGNED
+    ↓
+IN PROGRESS
+    ↓
+RESOLVED
+```
+
+Invalid reports can be:
+
+```text
+REJECTED
+```
+
+---
+
+# 🔄 System Workflow
+
+The complete system workflow is:
+
+```text
+                 ┌───────────────┐
+                 │    Citizen    │
+                 └───────┬───────┘
+                         │
+                         ▼
+                 ┌───────────────┐
+                 │ Register/Login│
+                 └───────┬───────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │ Create Report   │
+                └────────┬────────┘
+                         │
+              ┌──────────┴──────────┐
+              ▼                     ▼
+        Upload Image          Capture Location
+              │                     │
+              └──────────┬──────────┘
+                         ▼
+                  ┌──────────────┐
+                  │ Submit Report│
+                  └───────┬──────┘
+                          │
+                          ▼
+                  ┌──────────────┐
+                  │   Database   │
+                  └───────┬──────┘
+                          │
+                          ▼
+                  ┌──────────────┐
+                  │ Admin Review │
+                  └───────┬──────┘
+                          │
+              ┌───────────┴───────────┐
+              ▼                       ▼
+          Rejected                 Verified
+                                      │
+                                      ▼
+                                Assigned for Repair
+                                      │
+                                      ▼
+                                Work in Progress
+                                      │
+                                      ▼
+                                   Resolved
+```
+
+---
+
+# 🏗️ System Architecture
+
+RoadFix-LK follows a simple layered web architecture.
+
+```text
+┌──────────────────────────────────────────────┐
+│              USER INTERFACE                  │
+│                                              │
+│ HTML5 + CSS3 + Bootstrap + JavaScript        │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│              FLASK APPLICATION               │
+│                                              │
+│ Routes + Authentication + Business Logic     │
+└──────────────────────┬───────────────────────┘
+                       │
+          ┌────────────┴─────────────┐
+          ▼                          ▼
+┌───────────────────┐       ┌──────────────────┐
+│ SQLite Database   │       │ File/Image Store │
+│                   │       │                  │
+│ Users             │       │ Road Images      │
+│ Reports           │       │ Uploaded Files   │
+│ Status            │       │                  │
+└───────────────────┘       └──────────────────┘
+          │
+          ▼
+┌──────────────────────────────────────────────┐
+│             Mapping Services                 │
+│                                              │
+│ Leaflet.js + OpenStreetMap                   │
+└──────────────────────────────────────────────┘
+```
+
+---
+
+# 🛠️ Technology Stack
+
+| Layer             | Technology               |
+| ----------------- | ------------------------ |
+| Backend           | Python                   |
+| Web Framework     | Flask                    |
+| Frontend          | HTML5                    |
+| Styling           | CSS3                     |
+| UI Framework      | Bootstrap                |
+| Client-side Logic | JavaScript               |
+| Database          | SQLite                   |
+| Image Processing  | OpenCV                   |
+| Maps              | Leaflet.js               |
+| Map Data          | OpenStreetMap            |
+| Version Control   | Git & GitHub             |
+| Deployment        | Flask-compatible hosting |
+
+---
+
+# 📁 Project Structure
+
+A recommended project structure is:
 
 ```text
 RoadFix-LK/
 │
 ├── app.py
-├── config.py
 ├── requirements.txt
 ├── README.md
+├── LICENSE
+├── .gitignore
 │
 ├── database/
-│   └── schema.sql
-│
-├── models/
-│   └── db.py
-│
-├── routes/
-│   ├── auth.py
-│   ├── reports.py
-│   ├── admin.py
-│   └── api.py
-│
-├── services/
-│   ├── ai.py
-│   ├── duplicate.py
-│   └── priority.py
-│
-├── templates/
-│   ├── base.html
-│   ├── login.html
-│   ├── signup.html
-│   ├── map.html
-│   ├── report_form.html
-│   ├── my_reports.html
-│   └── admin/
+│   └── roadfix.db
 │
 ├── static/
 │   ├── css/
 │   │   └── style.css
 │   │
 │   ├── js/
-│   │   └── app.js
+│   │   └── script.js
+│   │
+│   ├── images/
 │   │
 │   └── uploads/
 │
-└── tests/
-    └── ...
+├── templates/
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── report.html
+│   ├── reports.html
+│   ├── dashboard.html
+│   ├── admin.html
+│   └── map.html
+│
+└── utils/
+    └── image_processing.py
+```
+
+> The structure above represents the recommended organization. Adjust filenames according to the actual repository structure.
+
+---
+
+# 🗄️ Database Design
+
+The main database can contain tables such as:
+
+## Users
+
+```text
+Users
+│
+├── id
+├── name
+├── email
+├── password
+├── role
+└── created_at
 ```
 
 ---
 
-# 🚀 Getting Started
+## Reports
+
+```text
+Reports
+│
+├── id
+├── user_id
+├── damage_type
+├── description
+├── image
+├── latitude
+├── longitude
+├── severity
+├── status
+└── created_at
+```
+
+---
+
+## Status History
+
+For a future expanded version:
+
+```text
+StatusHistory
+│
+├── id
+├── report_id
+├── old_status
+├── new_status
+├── updated_by
+└── updated_at
+```
+
+---
+
+# 🔗 Database Relationship
+
+```text
+                 USERS
+                   │
+                   │ 1
+                   │
+                   │
+                   │ N
+                REPORTS
+                   │
+                   │
+                   ▼
+             STATUS HISTORY
+```
+
+One user can create multiple reports.
+
+One report can have multiple status history records.
+
+---
+
+# 🧩 Main Modules
+
+## Module 01 — Authentication
+
+Responsible for:
+
+* Registration
+* Login
+* Logout
+* Session management
+* Role checking
+
+---
+
+## Module 02 — Report Management
+
+Responsible for:
+
+* Create report
+* Read report
+* Update report
+* Delete report
+* Report validation
+
+---
+
+## Module 03 — Location Management
+
+Responsible for:
+
+* Latitude
+* Longitude
+* Map markers
+* Location visualization
+
+---
+
+## Module 04 — Image Management
+
+Responsible for:
+
+* Image upload
+* File validation
+* Image storage
+* Image processing
+
+---
+
+## Module 05 — Admin Dashboard
+
+Responsible for:
+
+* Viewing reports
+* Filtering reports
+* Updating status
+* Managing users
+* Monitoring unresolved issues
+
+---
+
+## Module 06 — Map Module
+
+Responsible for:
+
+* Interactive map
+* Report markers
+* Location information
+* Damage visualization
+
+---
+
+## Module 07 — OpenCV Module
+
+OpenCV can be used for future computer vision functionality.
+
+Possible features:
+
+```text
+Road Image
+     ↓
+Image Preprocessing
+     ↓
+Feature Detection
+     ↓
+Damage Detection
+     ↓
+Damage Classification
+     ↓
+Severity Estimation
+```
+
+---
+
+# 📡 API Endpoints
+
+The API structure can be expanded as the project becomes more REST-oriented.
+
+## Authentication
+
+| Method | Endpoint        | Description      |
+| ------ | --------------- | ---------------- |
+| POST   | `/api/register` | Register user    |
+| POST   | `/api/login`    | Login user       |
+| POST   | `/api/logout`   | Logout user      |
+| GET    | `/api/profile`  | Get user profile |
+
+---
+
+## Reports
+
+| Method | Endpoint            | Description   |
+| ------ | ------------------- | ------------- |
+| GET    | `/api/reports`      | Get reports   |
+| POST   | `/api/reports`      | Create report |
+| GET    | `/api/reports/<id>` | Get report    |
+| PUT    | `/api/reports/<id>` | Update report |
+| DELETE | `/api/reports/<id>` | Delete report |
+
+---
+
+## Admin
+
+| Method | Endpoint                     | Description          |
+| ------ | ---------------------------- | -------------------- |
+| GET    | `/admin/dashboard`           | Admin dashboard      |
+| GET    | `/admin/reports`             | Manage reports       |
+| PUT    | `/admin/reports/<id>/status` | Update report status |
+| GET    | `/admin/users`               | Manage users         |
+
+> These endpoints should only be documented as active once they exist in the implementation.
+
+---
+
+# 🔐 Security
+
+RoadFix-LK should follow basic web application security practices.
+
+## Password Security
+
+Passwords should never be stored as plain text.
+
+Use password hashing such as:
+
+```text
+Werkzeug Password Hashing
+```
+
+---
+
+## Authentication
+
+Authenticated sessions should be protected.
+
+Unauthorized users should not be allowed to access administrator functions.
+
+---
+
+## Role-Based Access Control
+
+Example:
+
+```text
+Citizen
+   │
+   ├── Create Report
+   ├── View Own Reports
+   └── Track Status
+
+Admin
+   │
+   ├── View Reports
+   ├── Verify Reports
+   ├── Update Status
+   └── Manage Users
+```
+
+---
+
+## Input Validation
+
+Validate:
+
+* User input
+* Email addresses
+* Report descriptions
+* Image files
+* Latitude/longitude
+* File sizes
+
+---
+
+## File Upload Security
+
+Uploaded files should be validated before storing them.
+
+Recommended restrictions:
+
+```text
+Allowed:
+JPG
+JPEG
+PNG
+WEBP
+```
+
+Avoid allowing executable file types.
+
+---
+
+# 🖥️ Screenshots
+
+Add actual screenshots from the application here.
+
+## 🏠 Home Page
+
+```text
+docs/screenshots/home.png
+```
+
+![Home Page](docs/screenshots/home.png)
+
+---
+
+## 🔐 Login Page
+
+```text
+docs/screenshots/login.png
+```
+
+![Login Page](docs/screenshots/login.png)
+
+---
+
+## 📝 Report Submission
+
+```text
+docs/screenshots/report.png
+```
+
+![Report Submission](docs/screenshots/report.png)
+
+---
+
+## 🗺️ Road Damage Map
+
+```text
+docs/screenshots/map.png
+```
+
+![Road Damage Map](docs/screenshots/map.png)
+
+---
+
+## 👨‍💼 Admin Dashboard
+
+```text
+docs/screenshots/admin-dashboard.png
+```
+
+![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+
+---
+
+# 🚀 Installation
 
 ## 1. Clone the Repository
 
@@ -209,15 +785,13 @@ RoadFix-LK/
 git clone https://github.com/DulanMadhukaWeerathunga2000/RoadFix-LK.git
 ```
 
-Go to the project directory:
-
 ```bash
 cd RoadFix-LK
 ```
 
 ---
 
-## 2. Create a Virtual Environment
+# 🐍 2. Create Virtual Environment
 
 Windows:
 
@@ -225,292 +799,534 @@ Windows:
 python -m venv venv
 ```
 
-Activate it:
+Activate:
 
 ```bash
 venv\Scripts\activate
 ```
 
+Linux/macOS:
+
+```bash
+python3 -m venv venv
+```
+
+```bash
+source venv/bin/activate
+```
+
 ---
 
-## 3. Install Dependencies
+# 📦 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
+If `requirements.txt` does not exist yet:
+
+```bash
+pip install flask
+```
+
+Install other dependencies according to the implemented modules.
+
 ---
 
-## 4. Run the Application
+# ⚙️ Configuration
+
+Create a `.env` file if environment variables are used.
+
+Example:
+
+```env
+SECRET_KEY=your-secret-key
+DATABASE_PATH=roadfix.db
+UPLOAD_FOLDER=static/uploads
+```
+
+Do not commit sensitive credentials to GitHub.
+
+Add `.env` to:
+
+```text
+.gitignore
+```
+
+---
+
+# ▶️ Running the Application
+
+Run:
 
 ```bash
 python app.py
 ```
 
-The application will run locally at:
+The Flask development server will normally be available at:
 
 ```text
 http://127.0.0.1:5000
 ```
 
-Open the URL in your browser.
-
----
-
-# 🔐 User Roles
-
-## Citizen
-
-Citizens can:
-
-```text
-Register
-   ↓
-Login
-   ↓
-Report Road Issue
-   ↓
-Detect Location
-   ↓
-Upload Photo
-   ↓
-Select Damage Type
-   ↓
-Select Severity
-   ↓
-Submit Report
-   ↓
-Track Report
-```
-
-## Administrator
-
-Administrators can:
-
-```text
-Login
-   ↓
-View Reports
-   ↓
-Review Reports
-   ↓
-Verify Reports
-   ↓
-Assign Officer
-   ↓
-Update Status
-   ↓
-Monitor Progress
-```
-
----
-
-# 🗺️ Road Issue Reporting Flow
-
-```text
-User
- │
- ▼
-Detect Current Location
- │
- ▼
-Show Location on Map
- │
- ▼
-User Confirms / Moves Pin
- │
- ▼
-Upload Road Image
- │
- ▼
-Select Damage Type
- │
- ▼
-Select Severity
- │
- ▼
-Submit Report
- │
- ▼
-Database
- │
- ▼
-Admin Review
- │
- ▼
-Map Visualization
-```
-
----
-
-# 📍 Location Detection
-
-RoadFix LK uses browser-based geolocation to detect the user's current location.
-
-Users can also manually adjust the location by:
-
-* Dragging the map marker
-* Clicking a location on the map
-
-This is useful when the automatically detected location is not accurate enough.
-
----
-
-# 🚨 Severity Levels
-
-Road issues can be categorized based on their severity:
-
-| Severity    | Description                                         |
-| ----------- | --------------------------------------------------- |
-| 🔴 Critical | Dangerous road condition requiring urgent attention |
-| 🟠 High     | Serious road issue that should be addressed soon    |
-| 🟡 Medium   | Moderate road damage                                |
-| 🟢 Low      | Minor road issue                                    |
-
----
-
-# 🗺️ Map Visualization
-
-Reported road issues are displayed on an interactive map.
-
-Different colors are used to represent the severity/status of road issues.
-
-```text
-🔴 Critical
-🟠 High
-🟡 Medium / Low
-🟢 Resolved
-```
-
-Users can click a marker to view information about the reported issue.
-
----
-
-# 🤖 AI-Based Features
-
-RoadFix LK includes AI/image-processing related functionality to support road damage analysis.
-
-The system can be extended to detect:
-
-* Potholes
-* Road cracks
-* Surface damage
-* Other visible road defects
-
-The AI component can assist administrators by providing an initial damage classification.
-
----
-
-# 🔄 Report Status
-
-A road report can move through different stages:
-
-```text
-New
- ↓
-Verified
- ↓
-Assigned
- ↓
-In Progress
- ↓
-Resolved
- ↓
-Confirmed
-```
-
-This allows citizens and administrators to track the progress of reported road issues.
+Open the address in a web browser.
 
 ---
 
 # 🧪 Testing
 
-The project can be tested locally using:
+Basic testing should cover:
 
-* Manual functional testing
-* User authentication testing
-* Report submission testing
-* Location testing
-* Image upload testing
-* Map testing
-* Admin functionality testing
-* API testing
+### Authentication
 
----
+* Registration
+* Login
+* Logout
+* Invalid credentials
 
-# 🔒 Security Considerations
+### Reporting
 
-The project includes authentication and role-based access concepts.
+* Create report
+* Upload image
+* Validate location
+* Validate required fields
 
-For production use, additional security improvements should be implemented, including:
+### Administration
 
-* Strong password hashing
-* Secure session management
-* CSRF protection
-* File upload validation
-* Input validation
-* Rate limiting
-* Secure secret keys
-* Production database configuration
+* Admin login
+* View reports
+* Change report status
+* Reject invalid reports
 
----
+### Map
 
-# 🎯 Future Improvements
-
-Future versions of RoadFix LK can include:
-
-* 📱 Mobile application
-* 🤖 Improved AI road damage detection
-* 📊 Advanced analytics dashboard
-* 📧 Email notifications
-* 📱 SMS notifications
-* 🗺️ Advanced GIS features
-* 👮 Officer mobile interface
-* 📈 Road maintenance statistics
-* ☁️ Cloud deployment
-* 🔐 Two-factor authentication
+* Display markers
+* Display correct coordinates
+* Open report information
 
 ---
 
-# 🎓 Academic Project
+# 📊 Example Report Lifecycle
 
-RoadFix LK was developed as a software engineering project to demonstrate the practical application of:
+```text
+                    ┌───────────┐
+                    │ SUBMITTED │
+                    └─────┬─────┘
+                          │
+                          ▼
+                  ┌──────────────┐
+                  │ UNDER REVIEW │
+                  └──────┬───────┘
+                         │
+                 ┌───────┴───────┐
+                 ▼               ▼
+             REJECTED         VERIFIED
+                                 │
+                                 ▼
+                              ASSIGNED
+                                 │
+                                 ▼
+                            IN PROGRESS
+                                 │
+                                 ▼
+                              RESOLVED
+```
 
-* Web application development
-* Software engineering principles
-* Database management
-* REST API development
-* Location-based services
-* Map integration
-* Image processing
-* User authentication
-* Role-based access control
+---
+
+# 🔮 Future Improvements
+
+RoadFix-LK can be expanded into a real-world smart road monitoring platform.
+
+## 🤖 1. AI Road Damage Detection
+
+Use computer vision to detect:
+
+* Potholes
+* Cracks
+* Road surface damage
+* Damage severity
+
+Possible pipeline:
+
+```text
+Image
+  ↓
+OpenCV Preprocessing
+  ↓
+AI/ML Model
+  ↓
+Damage Detection
+  ↓
+Classification
+  ↓
+Severity Score
+```
+
+---
+
+## 📱 2. Mobile Application
+
+Future versions can provide:
+
+* Android application
+* iOS application
+* GPS-based reporting
+* Camera integration
+* Push notifications
+* Offline reporting
+
+---
+
+## 🔔 3. Notifications
+
+Users could receive:
+
+```text
+Report Submitted
+        ↓
+Report Verified
+        ↓
+Repair Started
+        ↓
+Repair Completed
+```
+
+Notifications can later be implemented using email, SMS, or push notifications.
+
+---
+
+## 🔄 4. Real-Time Updates
+
+Future versions can use:
+
+```text
+WebSocket / Socket.IO
+```
+
+for real-time:
+
+* Report status updates
+* Admin notifications
+* New road damage alerts
+* Dashboard updates
+
+---
+
+## 📊 5. Analytics Dashboard
+
+The system can provide:
+
+* Total reports
+* Resolved reports
+* Pending reports
+* Reports by district
+* Reports by damage type
+* Monthly statistics
+* Average resolution time
+
+Example:
+
+```text
+Total Reports       : 1,250
+Resolved            : 850
+Pending             : 250
+Under Investigation : 100
+Rejected            : 50
+```
+
+---
+
+## 📍 6. Heatmap
+
+Road damage reports can be converted into a heatmap.
+
+```text
+Low Risk     🟢
+Medium Risk  🟡
+High Risk    🟠
+Critical     🔴
+```
+
+This can help authorities identify areas requiring urgent attention.
+
+---
+
+# 🗺️ Project Roadmap
+
+## Phase 1 — Foundation
+
+* [x] Project setup
+* [x] Flask backend
+* [x] Basic frontend
+* [x] SQLite database
+* [x] User authentication
+
+---
+
+## Phase 2 — Road Reporting
+
+* [x] Road damage report form
+* [x] Image upload
+* [x] Description
+* [x] Location information
+* [x] Database storage
+
+---
+
+## Phase 3 — Map Integration
+
+* [x] Leaflet.js integration
+* [x] OpenStreetMap
+* [x] Report markers
+* [ ] Advanced filtering
+* [ ] Damage heatmap
+
+---
+
+## Phase 4 — Admin Management
+
+* [x] Admin dashboard
+* [x] Report management
+* [x] Status management
+* [ ] Assignment management
+* [ ] Repair verification
+
+---
+
+## Phase 5 — Smart Features
+
+* [ ] Duplicate report detection
+* [ ] Automatic severity classification
+* [ ] OpenCV image analysis
+* [ ] AI pothole detection
+* [ ] AI damage classification
+
+---
+
+## Phase 6 — Real-Time Platform
+
+* [ ] WebSocket integration
+* [ ] Real-time notifications
+* [ ] Live dashboard updates
+* [ ] SMS notifications
+* [ ] Email notifications
+
+---
+
+## Phase 7 — Mobile Application
+
+* [ ] Android application
+* [ ] iOS application
+* [ ] GPS integration
+* [ ] Offline reporting
+* [ ] Push notifications
+
+---
+
+## Phase 8 — Production Deployment
+
+* [ ] Production database
+* [ ] HTTPS
+* [ ] Cloud deployment
+* [ ] Monitoring
+* [ ] Automated backups
+* [ ] CI/CD pipeline
+
+---
+
+# 🌐 Future Real-Time Architecture
+
+The long-term architecture can evolve into:
+
+```text
+                 CITIZEN MOBILE APP
+                         │
+                         ▼
+                 ┌───────────────┐
+                 │  API Gateway  │
+                 └───────┬───────┘
+                         │
+          ┌──────────────┼──────────────┐
+          ▼              ▼              ▼
+     Report Service  User Service   AI Service
+          │              │              │
+          │              │              ▼
+          │              │        Damage Detection
+          │              │
+          └───────┬──────┘
+                  ▼
+             PostgreSQL
+                  │
+        ┌─────────┴─────────┐
+        ▼                   ▼
+     Redis              File Storage
+        │
+        ▼
+   Real-Time Events
+        │
+        ▼
+   Admin Dashboard
+        │
+        ▼
+ Authorities / Repair Teams
+```
+
+---
+
+# 🎯 Real-World Version
+
+The final real-world version of RoadFix-LK can follow this workflow:
+
+```text
+Citizen
+   ↓
+Capture Road Damage
+   ↓
+GPS Location
+   ↓
+Upload Image
+   ↓
+AI Damage Detection
+   ↓
+Duplicate Detection
+   ↓
+Severity Calculation
+   ↓
+Database
+   ↓
+Authority Dashboard
+   ↓
+Assign Repair Team
+   ↓
+Repair Work
+   ↓
+Upload Completion Evidence
+   ↓
+Admin Verification
+   ↓
+RESOLVED
+   ↓
+Citizen Notification
+```
+
+This transforms RoadFix-LK from a simple complaint management system into a **Smart Road Infrastructure Monitoring Platform**.
+
+---
+
+# 📈 Expected Benefits
+
+RoadFix-LK can help:
+
+### Citizens
+
+* Report road problems easily
+* Track complaints
+* See reported road issues
+* Provide evidence through images
+
+### Authorities
+
+* Centralize complaints
+* Identify high-priority locations
+* Monitor unresolved problems
+* Track repair progress
+* Analyze road damage data
+
+### Community
+
+* Improve road safety
+* Reduce duplicate complaints
+* Improve transparency
+* Support data-driven road maintenance
+
+---
+
+# 🤝 Contribution
+
+Contributions are welcome.
+
+### Step 1
+
+Fork the repository.
+
+### Step 2
+
+Create a feature branch:
+
+```bash
+git checkout -b feature/new-feature
+```
+
+### Step 3
+
+Make your changes.
+
+### Step 4
+
+Commit:
+
+```bash
+git commit -m "Add new road reporting feature"
+```
+
+### Step 5
+
+Push:
+
+```bash
+git push origin feature/new-feature
+```
+
+### Step 6
+
+Create a Pull Request.
 
 ---
 
 # 👨‍💻 Author
 
-**Dulan Madhuka Weerathunga**
+## Dulan Madhuka Weerathunga
 
 GitHub:
 
-[https://github.com/DulanMadhukaWeerathunga2000](https://github.com/DulanMadhukaWeerathunga2000)
+https://github.com/DulanMadhukaWeerathunga2000
 
 Project:
 
-[https://github.com/DulanMadhukaWeerathunga2000/RoadFix-LK](https://github.com/DulanMadhukaWeerathunga2000/RoadFix-LK)
+https://github.com/DulanMadhukaWeerathunga2000/RoadFix-LK
+
+---
+
+# 🙏 Acknowledgments
+
+RoadFix-LK uses and is inspired by open-source technologies and mapping resources including:
+
+* Python
+* Flask
+* SQLite
+* Bootstrap
+* JavaScript
+* OpenCV
+* Leaflet.js
+* OpenStreetMap
+
+Special thanks to the open-source community and developers contributing to civic technology and road safety solutions.
 
 ---
 
 # 📄 License
 
-This project is developed for educational and academic purposes.
+This project is licensed under the **MIT License**.
+
+See the `LICENSE` file for more information.
 
 ---
 
-## ⭐ Support
+# ⭐ RoadFix-LK
 
-If you find this project useful, consider giving the repository a ⭐ on GitHub.
+**Report. Track. Repair. Improve.**
 
-````
+> Building a smarter and safer road infrastructure management system for Sri Lanka 🇱🇰
 
+---
