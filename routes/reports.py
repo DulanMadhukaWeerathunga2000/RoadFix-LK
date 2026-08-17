@@ -7,7 +7,7 @@ from flask import (
 )
 from werkzeug.utils import secure_filename
 
-from models.db import query, execute
+from models.models import db, Report, ReportStatusHistory, Notification
 from utils.decorators import login_required
 from services.duplicate_detection import find_duplicate, merge_into
 from services.priority import recalculate_priority
@@ -43,10 +43,9 @@ def _allowed_file(filename):
 
 
 def _notify(user_id, report_id, message):
-    execute(
-        "INSERT INTO notifications (user_id, report_id, message) VALUES (?, ?, ?)",
-        (user_id, report_id, message),
-    )
+    new_notif = Notification(user_id=user_id, report_id=report_id, message=message)
+    db.session.add(new_notif)
+    db.session.commit()
 
 
 @bp.route("/new", methods=["GET", "POST"])
@@ -94,15 +93,22 @@ def new_report():
         # --- Duplicate detection ---
         duplicate = find_duplicate(latitude, longitude, damage_type)
         if duplicate:
-            merge_into(duplicate["id"])
-            execute(
-                """INSERT INTO reports
-                   (user_id, damage_type, description, severity, latitude, longitude,
-                    address_hint, image_path, status, duplicate_of)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'new', ?)""",
-                (session["user_id"], damage_type, description, severity, latitude, longitude,
-                 address_hint, image_path, duplicate["id"]),
+            merge_into(duplicate.id)
+            new_report = Report(
+                user_id=session["user_id"],
+                damage_type=damage_type,
+                description=description,
+                severity=severity,
+                latitude=latitude,
+                longitude=longitude,
+                address_hint=address_hint,
+                image_path=image_path,
+                status='new',
+                duplicate_of=duplicate.id
             )
+            db.session.add(new_report)
+            db.session.commit()
+            
             flash(
                 "A similar issue has already been reported nearby. "
                 "We've linked your report to the existing one to speed up its resolution.",
@@ -121,14 +127,23 @@ def new_report():
                 ai_severity = suggestion["severity"]
                 ai_reasoning = suggestion.get("ai_reasoning")
 
-        report_id = execute(
-            """INSERT INTO reports
-               (user_id, damage_type, description, severity, latitude, longitude,
-                address_hint, image_path, status, ai_suggested_type, ai_suggested_severity, ai_reasoning)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?)""",
-            (session["user_id"], damage_type, description, severity, latitude, longitude,
-             address_hint, image_path, ai_type, ai_severity, ai_reasoning),
+        new_report = Report(
+            user_id=session["user_id"],
+            damage_type=damage_type,
+            description=description,
+            severity=severity,
+            latitude=latitude,
+            longitude=longitude,
+            address_hint=address_hint,
+            image_path=image_path,
+            status='new',
+            ai_suggested_type=ai_type,
+            ai_suggested_severity=ai_severity,
+            ai_reasoning=ai_reasoning
         )
+        db.session.add(new_report)
+        db.session.commit()
+        report_id = new_report.id
         recalculate_priority(report_id)
         flash("Report submitted. Thank you for helping improve our roads!", "success")
         return redirect(url_for("reports.my_reports"))
@@ -141,25 +156,19 @@ def new_report():
 @bp.route("/mine")
 @login_required
 def my_reports():
-    rows = query(
-        "SELECT * FROM reports WHERE user_id = ? ORDER BY created_at DESC",
-        (session["user_id"],),
-    )
+    rows = Report.query.filter_by(user_id=session["user_id"]).order_by(Report.created_at.desc()).all()
     return render_template("my_reports.html", reports=rows, status_labels=STATUS_LABELS)
 
 
 @bp.route("/<int:report_id>")
 @login_required
 def detail(report_id):
-    report = query("SELECT * FROM reports WHERE id = ?", (report_id,), one=True)
+    report = db.session.get(Report, report_id)
     if report is None:
         abort(404)
-    if report["user_id"] != session["user_id"] and session.get("role") not in ("admin", "officer"):
+    if report.user_id != session["user_id"] and session.get("role") not in ("admin", "officer"):
         abort(403)
-    history = query(
-        "SELECT * FROM report_status_history WHERE report_id = ? ORDER BY changed_at ASC",
-        (report_id,),
-    )
+    history = ReportStatusHistory.query.filter_by(report_id=report_id).order_by(ReportStatusHistory.changed_at.asc()).all()
     return render_template(
         "report_detail.html", report=report, history=history, status_labels=STATUS_LABELS
     )
@@ -169,24 +178,26 @@ def detail(report_id):
 @login_required
 def confirm_resolved(report_id):
     """Citizen confirms the repair is actually done (final step of the pipeline)."""
-    report = query("SELECT * FROM reports WHERE id = ?", (report_id,), one=True)
+    report = db.session.get(Report, report_id)
     if report is None:
         abort(404)
-    if report["user_id"] != session["user_id"]:
+    if report.user_id != session["user_id"]:
         abort(403)
-    if report["status"] != "completed":
+    if report.status != "completed":
         flash("This report isn't marked as completed yet.", "warning")
         return redirect(url_for("reports.detail", report_id=report_id))
 
-    execute(
-        "UPDATE reports SET status = 'resolved_confirmed', updated_at = datetime('now') WHERE id = ?",
-        (report_id,),
+    report.status = "resolved_confirmed"
+    
+    history_entry = ReportStatusHistory(
+        report_id=report_id,
+        old_status='completed',
+        new_status='resolved_confirmed',
+        changed_by=session["user_id"],
+        note='Confirmed by reporting citizen'
     )
-    execute(
-        "INSERT INTO report_status_history (report_id, old_status, new_status, changed_by, note) "
-        "VALUES (?, 'completed', 'resolved_confirmed', ?, 'Confirmed by reporting citizen')",
-        (report_id, session["user_id"]),
-    )
+    db.session.add(history_entry)
+    db.session.commit()
     flash("Thanks for confirming! Report closed.", "success")
     return redirect(url_for("reports.detail", report_id=report_id))
 
@@ -194,9 +205,12 @@ def confirm_resolved(report_id):
 @bp.route("/notifications")
 @login_required
 def notifications():
-    rows = query(
-        "SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 30",
-        (session["user_id"],),
-    )
-    execute("UPDATE notifications SET is_read = 1 WHERE user_id = ?", (session["user_id"],))
+    rows = Notification.query.filter_by(user_id=session["user_id"]).order_by(Notification.created_at.desc()).limit(30).all()
+    
+    # Mark as read
+    for row in rows:
+        if not row.is_read:
+            row.is_read = True
+    db.session.commit()
+    
     return render_template("notifications.html", notifications=rows)
