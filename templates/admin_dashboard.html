@@ -2,91 +2,98 @@
 {% block title %}Admin Dashboard - RoadFix LK{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h4 class="mb-0 fw-bold" style="color: var(--secondary-color);"><i class="bi bi-speedometer2"></i> Authority Dashboard</h4>
+  <h3 class="mb-0 fw-bold" style="color: var(--secondary-color);"><i class="bi bi-speedometer2 text-primary me-2"></i> Authority Dashboard</h3>
 </div>
 
-<div class="row g-4 mb-5">
+<!-- Key Metrics Row -->
+<div class="row g-4 mb-4">
   <div class="col-6 col-md-4 col-lg-2">
-    <div class="card text-center border-0 shadow-sm h-100 hover-lift"><div class="card-body d-flex flex-column justify-content-center">
-      <div class="fs-2 fw-bold text-dark">{{ stats.total }}</div><div class="text-muted small fw-medium text-uppercase mt-1">Total reports</div>
-    </div></div>
-  </div>
-  <div class="col-6 col-md-4 col-lg-2">
-    <div class="card text-center border-0 shadow-sm h-100 hover-lift"><div class="card-body d-flex flex-column justify-content-center">
-      <div class="fs-2 fw-bold text-primary">{{ stats.new }}</div><div class="text-muted small fw-medium text-uppercase mt-1">New</div>
-    </div></div>
-  </div>
-  <div class="col-6 col-md-4 col-lg-2">
-    <div class="card text-center border-0 shadow-sm h-100 hover-lift"><div class="card-body d-flex flex-column justify-content-center">
-      <div class="fs-2 fw-bold text-warning">{{ stats.pending }}</div><div class="text-muted small fw-medium text-uppercase mt-1">Pending repair</div>
-    </div></div>
-  </div>
-  <div class="col-6 col-md-4 col-lg-2">
-    <div class="card text-center border-0 shadow-sm h-100 hover-lift"><div class="card-body d-flex flex-column justify-content-center">
-      <div class="fs-2 fw-bold text-success">{{ stats.completed }}</div><div class="text-muted small fw-medium text-uppercase mt-1">Completed</div>
-    </div></div>
-  </div>
-  <div class="col-6 col-md-4 col-lg-2">
-    <div class="card text-center border-0 shadow-sm h-100 hover-lift"><div class="card-body d-flex flex-column justify-content-center">
-      <div class="fs-2 fw-bold text-danger">{{ stats.critical }}</div><div class="text-muted small fw-medium text-uppercase mt-1">Critical open</div>
-    </div></div>
-  </div>
-  <div class="col-6 col-md-4 col-lg-2">
-    <div class="card text-center border-0 shadow-sm h-100 hover-lift"><div class="card-body d-flex flex-column justify-content-center">
-      <div class="fs-2 fw-bold text-info">{{ stats.avg_repair_days }}d</div><div class="text-muted small fw-medium text-uppercase mt-1">Avg repair time</div>
-    </div></div>
-  </div>
-</div>
-
-<div class="row g-4">
-  <div class="col-lg-4">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
-        <h6 class="fw-bold mb-0 text-secondary">Area-wise reports</h6>
-      </div>
-      <div class="card-body p-0">
-        <table class="table table-hover align-middle mb-0">
-          <tbody>
-            {% for a in area_stats %}
-            <tr><td class="ps-4">{{ a.area }}</td><td class="text-end pe-4 fw-bold">{{ a.c }}</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
+    <div class="card border-0 shadow-sm h-100 hover-lift rounded-4" style="background: linear-gradient(135deg, #ffffff, #f8fafc);">
+      <div class="card-body d-flex flex-column justify-content-center text-center p-3">
+        <div class="fs-1 fw-bold text-dark">{{ stats.total }}</div>
+        <div class="text-muted small fw-semibold text-uppercase mt-1"><i class="bi bi-files me-1"></i> Total Reports</div>
       </div>
     </div>
   </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="card border-0 shadow-sm h-100 hover-lift rounded-4" style="background: linear-gradient(135deg, #ffffff, #e0f2fe);">
+      <div class="card-body d-flex flex-column justify-content-center text-center p-3">
+        <div class="fs-1 fw-bold text-primary">{{ stats.new }}</div>
+        <div class="text-primary small fw-semibold text-uppercase mt-1"><i class="bi bi-star-fill me-1"></i> New</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="card border-0 shadow-sm h-100 hover-lift rounded-4" style="background: linear-gradient(135deg, #ffffff, #fef3c7);">
+      <div class="card-body d-flex flex-column justify-content-center text-center p-3">
+        <div class="fs-1 fw-bold text-warning">{{ stats.pending }}</div>
+        <div class="text-warning small fw-semibold text-uppercase mt-1"><i class="bi bi-hourglass-split me-1"></i> Pending</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="card border-0 shadow-sm h-100 hover-lift rounded-4" style="background: linear-gradient(135deg, #ffffff, #dcfce7);">
+      <div class="card-body d-flex flex-column justify-content-center text-center p-3">
+        <div class="fs-1 fw-bold text-success">{{ stats.completed }}</div>
+        <div class="text-success small fw-semibold text-uppercase mt-1"><i class="bi bi-check-circle-fill me-1"></i> Completed</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="card border-0 shadow-sm h-100 hover-lift rounded-4" style="background: linear-gradient(135deg, #ffffff, #fee2e2);">
+      <div class="card-body d-flex flex-column justify-content-center text-center p-3">
+        <div class="fs-1 fw-bold text-danger">{{ stats.critical }}</div>
+        <div class="text-danger small fw-semibold text-uppercase mt-1"><i class="bi bi-exclamation-octagon-fill me-1"></i> Critical Open</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="card border-0 shadow-sm h-100 hover-lift rounded-4" style="background: linear-gradient(135deg, #ffffff, #f8fafc);">
+      <div class="card-body d-flex flex-column justify-content-center text-center p-3">
+        <div class="fs-2 fw-bold text-info">{{ stats.avg_repair_days }}<span class="fs-5">d</span></div>
+        <div class="text-info small fw-semibold text-uppercase mt-1"><i class="bi bi-clock-history me-1"></i> Avg Repair Time</div>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- Map and Area Stats Row -->
+<div class="row g-4 mb-4">
   <div class="col-lg-8">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-header bg-white border-bottom-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
-        <h6 class="fw-bold mb-0 text-secondary">Top priority reports</h6>
-        <a href="{{ url_for('admin.report_list') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">Manage all &rarr;</a>
+    <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+      <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0 text-secondary text-uppercase"><i class="bi bi-map-fill me-2"></i> Live Incident Map</h6>
+        <div class="small">
+          <span class="badge bg-danger rounded-pill me-1">Critical</span>
+          <span class="badge bg-warning text-dark rounded-pill me-1">High</span>
+          <span class="badge bg-info text-dark rounded-pill me-1">Medium</span>
+          <span class="badge" style="background-color: #2a9d8f;">Resolved</span>
+        </div>
+      </div>
+      <div class="card-body p-0 position-relative" style="height: 400px;">
+        <div id="admin-map" style="width: 100%; height: 100%; z-index: 1;"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm h-100 rounded-4">
+      <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
+        <h6 class="fw-bold mb-0 text-secondary text-uppercase"><i class="bi bi-bar-chart-fill me-2"></i> Area-wise Reports</h6>
       </div>
       <div class="card-body p-0">
-        <div class="table-responsive">
+        <div class="table-responsive h-100">
           <table class="table table-hover align-middle mb-0">
-            <thead class="table-light"><tr><th class="ps-4">#</th><th>Type</th><th>Sev.</th><th>Status</th><th>Priority</th><th>Dup.</th><th></th></tr></thead>
             <tbody>
-              {% for r in reports %}
+              {% for a in area_stats %}
               <tr>
-                <td class="ps-4 text-muted">#{{ r.id }}</td>
-                <td class="fw-medium">{{ r.damage_type.replace('_',' ')|title }}</td>
-                <td>
-                  <span class="badge 
-                    {% if r.severity == 'critical' %}bg-danger
-                    {% elif r.severity == 'high' %}bg-warning text-dark
-                    {% elif r.severity == 'medium' %}bg-info text-dark
-                    {% else %}bg-secondary{% endif %} rounded-pill">
-                    {{ r.severity|title }}
-                  </span>
+                <td class="ps-4 fw-medium text-dark">{{ a.area }}</td>
+                <td class="text-end pe-4">
+                  <span class="badge bg-primary rounded-pill px-3 py-2">{{ a.c }}</span>
                 </td>
-                <td>
-                  <span class="badge bg-light border text-dark rounded-pill">{{ r.status.replace('_',' ')|title }}</span>
-                </td>
-                <td class="fw-bold text-danger">{{ r.priority_score }}</td>
-                <td>{{ r.duplicate_count }}</td>
-                <td class="pe-4"><a href="{{ url_for('reports.detail', report_id=r.id) }}" class="btn btn-sm btn-light rounded-circle shadow-sm"><i class="bi bi-chevron-right"></i></a></td>
               </tr>
+              {% else %}
+              <tr><td colspan="2" class="text-center text-muted py-4">No area data available.</td></tr>
               {% endfor %}
             </tbody>
           </table>
@@ -95,4 +102,117 @@
     </div>
   </div>
 </div>
+
+<!-- Recent High Priority Reports Row -->
+<div class="row g-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white border-bottom-0 pt-4 pb-3 px-4 d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0 text-secondary text-uppercase"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i> Top Priority Reports</h6>
+        <a href="{{ url_for('admin.report_list') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">Manage All &rarr;</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-4 text-muted small text-uppercase">ID</th>
+                <th class="text-muted small text-uppercase">Type</th>
+                <th class="text-muted small text-uppercase">Severity</th>
+                <th class="text-muted small text-uppercase">Status</th>
+                <th class="text-muted small text-uppercase text-center">Priority</th>
+                <th class="text-muted small text-uppercase text-center">Duplicates</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in reports %}
+              <tr>
+                <td class="ps-4 text-secondary fw-medium">#{{ r.id }}</td>
+                <td class="fw-bold text-dark">{{ r.damage_type.replace('_',' ')|title }}</td>
+                <td>
+                  <span class="badge 
+                    {% if r.severity == 'critical' %}bg-danger
+                    {% elif r.severity == 'high' %}bg-warning text-dark
+                    {% elif r.severity == 'medium' %}bg-info text-dark
+                    {% else %}bg-secondary{% endif %} rounded-pill px-3 py-2 shadow-sm">
+                    {{ r.severity|title }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge bg-light border text-dark rounded-pill px-3 py-2 shadow-sm">{{ r.status.replace('_',' ')|title }}</span>
+                </td>
+                <td class="text-center">
+                  <span class="text-danger fw-bolder fs-5">{{ "%.1f"|format(r.priority_score) }}</span>
+                </td>
+                <td class="text-center">
+                  {% if r.duplicate_count > 0 %}
+                    <span class="badge bg-secondary rounded-circle p-2">{{ r.duplicate_count }}</span>
+                  {% else %}
+                    <span class="text-muted">-</span>
+                  {% endif %}
+                </td>
+                <td class="pe-4 text-end">
+                  <a href="{{ url_for('reports.detail', report_id=r.id) }}" class="btn btn-sm btn-light text-primary rounded-circle shadow-sm" title="View Details">
+                    <i class="bi bi-chevron-right"></i>
+                  </a>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="7" class="text-center py-5 text-muted">No reports found.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize Admin Map
+    const map = L.map("admin-map").setView([7.8731, 80.7718], 7); // Center of Sri Lanka
+    
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap"
+    }).addTo(map);
+
+    // Fetch reports for map
+    fetch("/api/map/reports")
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(report => {
+          const marker = L.circleMarker([report.lat, report.lng], {
+            radius: 8,
+            fillColor: report.color,
+            color: "#fff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.9
+          }).addTo(map);
+          
+          let popupContent = `
+            <div class="p-1">
+              <h6 class="fw-bold mb-1">#${report.id} - ${report.damage_type.replace('_',' ').toUpperCase()}</h6>
+              <div class="small mb-1">Severity: <span class="fw-bold" style="color:${report.color}">${report.severity.toUpperCase()}</span></div>
+              <div class="small mb-2">Status: <b>${report.status.replace('_',' ')}</b></div>
+              <a href="/reports/${report.id}" class="btn btn-sm btn-primary py-0 w-100" style="font-size:0.8rem;">View Report</a>
+            </div>
+          `;
+          marker.bindPopup(popupContent);
+        });
+
+        // Fit map bounds if we have points
+        if (data.length > 0) {
+          const bounds = L.latLngBounds(data.map(r => [r.lat, r.lng]));
+          map.fitBounds(bounds, { padding: [30, 30] });
+        }
+      })
+      .catch(err => console.error("Error loading map data:", err));
+  });
+</script>
 {% endblock %}

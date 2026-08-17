@@ -2,53 +2,78 @@
 {% block title %}Manage Reports - RoadFix LK{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h4 class="mb-0 fw-bold" style="color: var(--secondary-color);"><i class="bi bi-list-check"></i> Manage Reports</h4>
+  <h3 class="mb-0 fw-bold" style="color: var(--secondary-color);"><i class="bi bi-list-check text-primary me-2"></i> Manage Reports</h3>
 </div>
 
-<div class="card border-0 shadow-sm mb-4">
+<div class="card border-0 shadow-sm mb-4 rounded-4" style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px);">
   <div class="card-body py-3">
     <div class="d-flex flex-wrap gap-2">
-      <a href="{{ url_for('admin.report_list') }}" class="btn btn-sm rounded-pill px-3 {{ 'btn-primary shadow-sm' if not status_filter else 'btn-outline-secondary' }}">All</a>
+      <a href="{{ url_for('admin.report_list') }}" class="btn btn-sm rounded-pill px-4 fw-bold {{ 'btn-primary shadow' if not status_filter else 'btn-light border text-muted' }}">All</a>
       {% for s in ['new','verified','assigned','under_repair','completed','resolved_confirmed','rejected'] %}
-        <a href="{{ url_for('admin.report_list', status=s) }}" class="btn btn-sm rounded-pill px-3 {{ 'btn-primary shadow-sm' if status_filter==s else 'btn-outline-secondary' }}">{{ s.replace('_',' ')|title }}</a>
+        <a href="{{ url_for('admin.report_list', status=s) }}" class="btn btn-sm rounded-pill px-4 fw-bold {{ 'btn-primary shadow' if status_filter==s else 'btn-light border text-muted' }}">{{ s.replace('_',' ')|title }}</a>
       {% endfor %}
     </div>
   </div>
 </div>
 
-<div class="card border-0 shadow-sm">
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
   <div class="card-body p-0">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead class="table-light">
           <tr>
-            <th class="ps-4">#</th><th>Type</th><th>Sev.</th><th>Reporter</th><th>Status</th><th>Priority</th><th>Dup.</th><th class="pe-4">Action</th>
+            <th class="ps-4 text-muted small text-uppercase">ID</th>
+            <th class="text-muted small text-uppercase">Type</th>
+            <th class="text-muted small text-uppercase">Severity</th>
+            <th class="text-muted small text-uppercase">Reporter</th>
+            <th class="text-muted small text-uppercase">Status</th>
+            <th class="text-muted small text-uppercase text-center">Priority</th>
+            <th class="text-muted small text-uppercase text-center">Duplicates</th>
+            <th class="pe-4 text-muted small text-uppercase">Action</th>
           </tr>
         </thead>
         <tbody>
           {% for r in reports %}
           <tr>
-            <td class="ps-4"><a href="{{ url_for('reports.detail', report_id=r.id) }}" class="fw-bold text-decoration-none">#{{ r.id }}</a></td>
-            <td class="fw-medium">{{ r.damage_type.replace('_',' ')|title }}</td>
-            <td>
-              <span class="badge rounded-pill {% if r.severity == 'critical' %}bg-danger{% elif r.severity == 'high' %}bg-warning text-dark{% elif r.severity == 'medium' %}bg-info text-dark{% else %}bg-secondary{% endif %}">{{ r.severity|title }}</span>
+            <td class="ps-4">
+              <a href="{{ url_for('reports.detail', report_id=r.id) }}" class="fw-bold text-decoration-none text-primary">#{{ r.id }}</a>
             </td>
-            <td class="text-muted">{{ r.reporter_name }}</td>
-            <td><span class="badge bg-light border text-dark rounded-pill">{{ r.status.replace('_',' ')|title }}</span></td>
-            <td class="fw-bold text-danger">{{ r.priority_score }}</td>
-            <td>{{ r.duplicate_count }}</td>
-            <td class="pe-4" style="min-width:240px;">
+            <td class="fw-bold text-dark">{{ r.damage_type.replace('_',' ')|title }}</td>
+            <td>
+              <span class="badge rounded-pill shadow-sm px-3 py-2 
+                {% if r.severity == 'critical' %}bg-danger
+                {% elif r.severity == 'high' %}bg-warning text-dark
+                {% elif r.severity == 'medium' %}bg-info text-dark
+                {% else %}bg-secondary{% endif %}">
+                {{ r.severity|title }}
+              </span>
+            </td>
+            <td class="text-secondary fw-medium">{{ r.reporter.full_name }}</td>
+            <td>
+              <span class="badge bg-light border text-dark rounded-pill shadow-sm px-3 py-2">{{ r.status.replace('_',' ')|title }}</span>
+            </td>
+            <td class="text-center">
+              <span class="fw-bolder fs-5 text-danger">{{ "%.1f"|format(r.priority_score) }}</span>
+            </td>
+            <td class="text-center">
+              {% if r.duplicate_count > 0 %}
+                <span class="badge bg-secondary rounded-circle p-2 shadow-sm">{{ r.duplicate_count }}</span>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+            <td class="pe-4" style="min-width: 260px;">
               {% if r.status in ('new','verified','assigned','under_repair') %}
                 <form method="POST" action="{{ url_for('admin.advance_status', report_id=r.id) }}" class="d-flex gap-2">
                   {% if r.status == 'verified' %}
-                    <select name="officer_id" class="form-select form-select-sm" required>
+                    <select name="officer_id" class="form-select form-select-sm rounded-pill shadow-sm" required>
                       <option value="" disabled selected>Assign officer…</option>
                       {% for o in officers %}
                         <option value="{{ o.id }}">{{ o.full_name }}</option>
                       {% endfor %}
                     </select>
                   {% endif %}
-                  <button class="btn btn-sm btn-success fw-medium shadow-sm" type="submit">
+                  <button class="btn btn-sm btn-success fw-bold rounded-pill shadow-sm px-3" type="submit">
                     {% if r.status == 'new' %}Verify
                     {% elif r.status == 'verified' %}Assign
                     {% elif r.status == 'assigned' %}Start repair
@@ -58,15 +83,17 @@
                 </form>
                 {% if r.status == 'new' %}
                 <form method="POST" action="{{ url_for('admin.reject_report', report_id=r.id) }}" class="mt-2 d-flex gap-2">
-                  <input type="text" name="reason" class="form-control form-control-sm" placeholder="Rejection reason">
-                  <button class="btn btn-sm btn-outline-danger fw-medium" type="submit">Reject</button>
+                  <input type="text" name="reason" class="form-control form-control-sm rounded-pill shadow-sm" placeholder="Rejection reason">
+                  <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" type="submit">Reject</button>
                 </form>
                 {% endif %}
               {% else %}
-                <span class="text-muted small fw-medium"><i class="bi bi-check2-circle text-success me-1"></i>No action needed</span>
+                <span class="text-muted small fw-bold"><i class="bi bi-check2-circle text-success fs-5 me-1 align-middle"></i> No action needed</span>
               {% endif %}
             </td>
           </tr>
+          {% else %}
+          <tr><td colspan="8" class="text-center py-5 text-muted">No reports found for this filter.</td></tr>
           {% endfor %}
         </tbody>
       </table>
