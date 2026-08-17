@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Help Center - RoadFix LK{% endblock %}
+{% block content %}
+<div class="row justify-content-center mb-5 mt-4">
+  <div class="col-lg-8 text-center">
+    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 80px; height: 80px;">
+      <i class="bi bi-question-circle-fill fs-1"></i>
+    </div>
+    <h2 class="fw-bold mb-3" style="color: var(--secondary-color);">How can we help you?</h2>
+    <p class="text-muted fs-5">Welcome to the RoadFix LK Help Center. Find answers to common questions and learn how to use the platform effectively.</p>
+  </div>
+</div>
+
+<div class="row justify-content-center mb-5">
+  <div class="col-lg-10">
+    <!-- Citizens Section -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+      <div class="card-header bg-white border-bottom-0 pt-4 pb-3 px-4">
+        <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-person-fill me-2"></i> For Citizens (Reporters)</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="accordion accordion-flush" id="accordionCitizen">
+          
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                How do I report a road issue?
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionCitizen">
+              <div class="accordion-body text-muted">
+                1. Ensure you are logged into your account.<br>
+                2. Click on the <strong>"Report Issue"</strong> button in the top navigation bar.<br>
+                3. Drag the map marker to precisely select the location of the road damage.<br>
+                4. Upload a clear photograph of the damage by dragging it into the upload box.<br>
+                5. Select the damage type and severity, and provide any additional description or landmarks.<br>
+                6. Click <strong>"Submit Report"</strong>. Our AI will automatically analyze your image!
+              </div>
+            </div>
+          </div>
+          
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                How do I track the status of my report?
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionCitizen">
+              <div class="accordion-body text-muted">
+                You can track the status of your reports at any time by navigating to the <strong>"My Reports"</strong> page. 
+                Click on the report ID to view a detailed timeline of actions taken by the authorities. You will also receive 
+                in-app notifications when the status of your report changes.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0 border-bottom">
+            <h2 class="accordion-header" id="headingThree">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                Why was my report linked to another one?
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionCitizen">
+              <div class="accordion-body text-muted">
+                To keep our system efficient, we automatically detect duplicate reports. If someone else has already reported the 
+                exact same issue in the same location, your report will be linked to theirs. This increases the "Duplicate Count" 
+                of the original report, which instantly raises its Priority Score, ensuring authorities fix it faster!
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Officers & Admins Section -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+      <div class="card-header bg-white border-bottom-0 pt-4 pb-3 px-4">
+        <h5 class="fw-bold mb-0 text-danger"><i class="bi bi-shield-lock-fill me-2"></i> For Authorities (Officers & Admins)</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="accordion accordion-flush" id="accordionAdmin">
+          
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header" id="headingFour">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                How do I manage incoming reports?
+              </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionAdmin">
+              <div class="accordion-body text-muted">
+                Navigate to the <strong>"Manage Reports"</strong> page. You will see a list of all active reports, automatically sorted by 
+                their AI-calculated Priority Score. You can use the filter tabs at the top to view reports by their current status 
+                (New, Verified, Assigned, etc.).
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header" id="headingFive">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                What is the report lifecycle?
+              </button>
+            </h2>
+            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionAdmin">
+              <div class="accordion-body text-muted">
+                Reports follow a strict pipeline to ensure accountability:<br><br>
+                <span class="badge bg-secondary">New</span> &rarr; <span class="badge bg-primary">Verified</span> &rarr; 
+                <span class="badge bg-info">Assigned</span> &rarr; <span class="badge bg-warning text-dark">Under Repair</span> &rarr; 
+                <span class="badge bg-success">Completed</span> &rarr; <span class="badge" style="background-color: #2a9d8f;">Resolved (Confirmed)</span>
+                <br><br>
+                <em>Note: Only the citizen who originally reported the issue can move it from "Completed" to "Resolved" after verifying the repair in person.</em>
+              </div>
+            </div>
+          </div>
+          
+          <div class="accordion-item border-0 border-bottom">
+            <h2 class="accordion-header" id="headingSix">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                How does the Priority Score work?
+              </button>
+            </h2>
+            <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#accordionAdmin">
+              <div class="accordion-body text-muted">
+                The Priority Score (ranging from 0.0 to 100.0) is automatically calculated by the system to help authorities decide 
+                which issues to fix first. It factors in:
+                <ul>
+                  <li><strong>Severity:</strong> Critical issues receive higher base scores.</li>
+                  <li><strong>Duplicate Count:</strong> Issues reported by multiple citizens receive significant score boosts.</li>
+                  <li><strong>Age:</strong> Reports that have been open for a long time slowly gain priority so they aren't forgotten.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

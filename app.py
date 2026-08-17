@@ -48,6 +48,11 @@ def create_app(config_class=Config):
         from flask import render_template
         return render_template("map.html")
 
+    @app.route("/help")
+    def help_view():
+        from flask import render_template
+        return render_template("help.html")
+
     @app.errorhandler(400)
     def bad_request(e):
         app.logger.warning(f"400 Bad Request: {e}")
