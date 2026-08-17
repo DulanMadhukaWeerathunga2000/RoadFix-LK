@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, abort
+from werkzeug.security import generate_password_hash
 
 from models.db import query, execute
 from utils.decorators import roles_required
@@ -155,3 +156,39 @@ def reject_report(report_id):
     )
     flash(f"Report #{report_id} rejected.", "info")
     return redirect(url_for("admin.report_list"))
+
+
+@bp.route("/staff")
+@roles_required("admin")
+def manage_staff():
+    # Only admins can see this page
+    staff_members = query(
+        "SELECT id, full_name, email, role, created_at FROM users WHERE role IN ('admin', 'officer') ORDER BY role, created_at DESC"
+    )
+    return render_template("admin_staff.html", staff=staff_members)
+
+
+@bp.route("/staff/add", methods=["POST"])
+@roles_required("admin")
+def add_staff():
+    full_name = request.form.get("full_name", "").strip()
+    email = request.form.get("email", "").strip()
+    password = request.form.get("password", "")
+
+    if not full_name or not email or len(password) < 6:
+        flash("Invalid input. Please check the fields and try again.", "danger")
+        return redirect(url_for("admin.manage_staff"))
+
+    existing = query("SELECT id FROM users WHERE email = ?", (email,), one=True)
+    if existing:
+        flash("An account with that email already exists.", "danger")
+        return redirect(url_for("admin.manage_staff"))
+
+    # Create new officer
+    pwd_hash = generate_password_hash(password)
+    execute(
+        "INSERT INTO users (full_name, email, password_hash, role) VALUES (?, ?, ?, 'officer')",
+        (full_name, email, pwd_hash)
+    )
+    flash(f"Officer account for {full_name} created successfully!", "success")
+    return redirect(url_for("admin.manage_staff"))

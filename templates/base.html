@@ -23,6 +23,9 @@
           {% if session.get('role') in ('admin','officer') %}
             <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.report_list') }}"><i class="bi bi-list-check"></i> Manage Reports</a></li>
+            {% if session.get('role') == 'admin' %}
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.manage_staff') }}"><i class="bi bi-people-fill"></i> Manage Staff</a></li>
+            {% endif %}
           {% else %}
             <li class="nav-item"><a class="nav-link" href="{{ url_for('reports.new_report') }}"><i class="bi bi-plus-circle"></i> Report Issue</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('reports.my_reports') }}"><i class="bi bi-clipboard-data"></i> My Reports</a></li>
