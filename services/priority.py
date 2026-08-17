@@ -10,7 +10,7 @@ admin pipeline (New -> Verification -> Priority Calculation -> Assign Officer ->
 """
 from datetime import datetime
 from flask import current_app
-from models.db import query, execute
+from models.models import db, Report
 
 
 def compute_score(severity, duplicate_count, created_at):
@@ -29,9 +29,21 @@ def compute_score(severity, duplicate_count, created_at):
 
 
 def recalculate_priority(report_id):
-    report = query("SELECT * FROM reports WHERE id = ?", (report_id,), one=True)
+    report = db.session.get(Report, report_id)
     if report is None:
         return
-    score = compute_score(report["severity"], report["duplicate_count"], report["created_at"])
-    execute("UPDATE reports SET priority_score = ? WHERE id = ?", (score, report_id))
+    
+    # report.created_at is already a datetime object in SQLAlchemy
+    created_at_dt = report.created_at
+    age_days = max((datetime.utcnow() - created_at_dt).days, 0)
+    
+    weights = current_app.config["SEVERITY_WEIGHTS"]
+    severity_component = weights.get(report.severity, 1) * 10
+    duplicate_component = report.duplicate_count * 5
+    age_component = age_days * 0.5
+    
+    score = round(severity_component + duplicate_component + age_component, 2)
+    
+    report.priority_score = score
+    db.session.commit()
     return score

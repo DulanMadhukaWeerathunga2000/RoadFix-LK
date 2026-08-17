@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, session
-from models.db import query
+from models.models import db, Report, Notification
 from utils.decorators import login_required
 
 bp = Blueprint("api", __name__, url_prefix="/api")
@@ -18,36 +18,19 @@ def map_reports():
     Return all non-duplicate road reports for the public map.
     """
 
-    rows = query(
-        """
-        SELECT
-            id,
-            damage_type,
-            severity,
-            status,
-            latitude,
-            longitude,
-            address_hint,
-            duplicate_count,
-            created_at
-        FROM reports
-        WHERE duplicate_of IS NULL
-        ORDER BY created_at DESC
-        LIMIT 500
-        """
-    )
+    rows = Report.query.filter(Report.duplicate_of.is_(None)).order_by(Report.created_at.desc()).limit(500).all()
 
     features = []
 
     for r in rows:
 
         # Ignore invalid GPS coordinates
-        if r["latitude"] is None or r["longitude"] is None:
+        if r.latitude is None or r.longitude is None:
             continue
 
         try:
-            latitude = float(r["latitude"])
-            longitude = float(r["longitude"])
+            latitude = float(r.latitude)
+            longitude = float(r.longitude)
         except (TypeError, ValueError):
             continue
 
@@ -59,25 +42,25 @@ def map_reports():
             continue
 
         # Resolved = green
-        if r["status"] == "resolved_confirmed":
+        if r.status == "resolved_confirmed":
             color = "#2a9d8f"
         else:
             color = MARKER_COLORS.get(
-                r["severity"],
+                r.severity,
                 "#e9c46a"
             )
 
         features.append(
             {
-                "id": r["id"],
+                "id": r.id,
                 "lat": latitude,
                 "lng": longitude,
-                "damage_type": r["damage_type"],
-                "severity": r["severity"],
-                "status": r["status"],
-                "address_hint": r["address_hint"],
-                "duplicate_count": r["duplicate_count"] or 0,
-                "created_at": r["created_at"],
+                "damage_type": r.damage_type,
+                "severity": r.severity,
+                "status": r.status,
+                "address_hint": r.address_hint,
+                "duplicate_count": r.duplicate_count or 0,
+                "created_at": r.created_at.strftime("%Y-%m-%d %H:%M:%S") if r.created_at else None,
                 "color": color,
             }
         )
@@ -89,15 +72,7 @@ def map_reports():
 @login_required
 def report_status(report_id):
 
-    report = query(
-        """
-        SELECT status, updated_at
-        FROM reports
-        WHERE id = ?
-        """,
-        (report_id,),
-        one=True,
-    )
+    report = db.session.get(Report, report_id)
 
     if report is None:
         return jsonify({
@@ -105,8 +80,8 @@ def report_status(report_id):
         }), 404
 
     return jsonify({
-        "status": report["status"],
-        "updated_at": report["updated_at"]
+        "status": report.status,
+        "updated_at": report.updated_at.strftime("%Y-%m-%d %H:%M:%S") if report.updated_at else None
     })
 
 
@@ -114,17 +89,8 @@ def report_status(report_id):
 @login_required
 def unread_count():
 
-    row = query(
-        """
-        SELECT COUNT(*) AS count
-        FROM notifications
-        WHERE user_id = ?
-        AND is_read = 0
-        """,
-        (session["user_id"],),
-        one=True,
-    )
+    count = Notification.query.filter_by(user_id=session["user_id"], is_read=False).count()
 
     return jsonify({
-        "count": row["count"]
+        "count": count
     })
