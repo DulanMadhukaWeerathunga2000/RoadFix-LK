@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, session
+from flask import Blueprint, jsonify
+from flask_login import current_user
 from models.models import db, Report, Notification
 from utils.decorators import login_required
 
@@ -89,7 +90,7 @@ def report_status(report_id):
 @login_required
 def unread_count():
 
-    count = Notification.query.filter_by(user_id=session["user_id"], is_read=False).count()
+    count = Notification.query.filter_by(user_id=current_user.id, is_read=False).count()
 
     return jsonify({
         "count": count

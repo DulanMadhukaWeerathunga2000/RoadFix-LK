@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, abort
+from flask_login import current_user
 from werkzeug.security import generate_password_hash
 from sqlalchemy import func
 
@@ -99,7 +100,7 @@ def advance_status(report_id):
         report_id=report_id,
         old_status=current_status,
         new_status=next_status,
-        changed_by=session["user_id"]
+        changed_by=current_user.id
     )
     db.session.add(history)
     db.session.commit()
@@ -135,7 +136,7 @@ def reject_report(report_id):
         report_id=report_id,
         old_status=old_status,
         new_status='rejected',
-        changed_by=session["user_id"],
+        changed_by=current_user.id,
         note=reason
     )
     db.session.add(history)

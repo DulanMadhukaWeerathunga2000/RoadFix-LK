@@ -3,8 +3,9 @@ import uuid
 
 from flask import (
     Blueprint, render_template, request, redirect, url_for, flash,
-    session, current_app, abort
+    current_app, abort
 )
+from flask_login import current_user
 from werkzeug.utils import secure_filename
 
 from models.models import db, Report, ReportStatusHistory, Notification
@@ -95,7 +96,7 @@ def new_report():
         if duplicate:
             merge_into(duplicate.id)
             new_report = Report(
-                user_id=session["user_id"],
+                user_id=current_user.id,
                 damage_type=damage_type,
                 description=description,
                 severity=severity,
@@ -128,7 +129,7 @@ def new_report():
                 ai_reasoning = suggestion.get("ai_reasoning")
 
         new_report = Report(
-            user_id=session["user_id"],
+            user_id=current_user.id,
             damage_type=damage_type,
             description=description,
             severity=severity,
@@ -156,7 +157,7 @@ def new_report():
 @bp.route("/mine")
 @login_required
 def my_reports():
-    rows = Report.query.filter_by(user_id=session["user_id"]).order_by(Report.created_at.desc()).all()
+    rows = Report.query.filter_by(user_id=current_user.id).order_by(Report.created_at.desc()).all()
     return render_template("my_reports.html", reports=rows, status_labels=STATUS_LABELS)
 
 
@@ -166,7 +167,7 @@ def detail(report_id):
     report = db.session.get(Report, report_id)
     if report is None:
         abort(404)
-    if report.user_id != session["user_id"] and session.get("role") not in ("admin", "officer"):
+    if report.user_id != current_user.id and current_user.role not in ("admin", "officer"):
         abort(403)
     history = ReportStatusHistory.query.filter_by(report_id=report_id).order_by(ReportStatusHistory.changed_at.asc()).all()
     return render_template(
@@ -181,7 +182,7 @@ def confirm_resolved(report_id):
     report = db.session.get(Report, report_id)
     if report is None:
         abort(404)
-    if report.user_id != session["user_id"]:
+    if report.user_id != current_user.id:
         abort(403)
     if report.status != "completed":
         flash("This report isn't marked as completed yet.", "warning")
@@ -193,7 +194,7 @@ def confirm_resolved(report_id):
         report_id=report_id,
         old_status='completed',
         new_status='resolved_confirmed',
-        changed_by=session["user_id"],
+        changed_by=current_user.id,
         note='Confirmed by reporting citizen'
     )
     db.session.add(history_entry)
@@ -205,7 +206,7 @@ def confirm_resolved(report_id):
 @bp.route("/notifications")
 @login_required
 def notifications():
-    rows = Notification.query.filter_by(user_id=session["user_id"]).order_by(Notification.created_at.desc()).limit(30).all()
+    rows = Notification.query.filter_by(user_id=current_user.id).order_by(Notification.created_at.desc()).limit(30).all()
     
     # Mark as read
     for row in rows:

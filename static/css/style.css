@@ -198,3 +198,23 @@ h1, h2, h3, h4, h5, h6 {
 .animate-entrance {
   animation: slideDownFade 0.4s ease-out forwards;
 }
+
+
+/* Auth Glassmorphism */
+.auth-bg { background: linear-gradient(135deg, #1e3a8a, #3b82f6); min-height: 100vh; padding-top: 100px; display: flex; align-items: center; justify-content: center; margin-top: -60px; margin-bottom: -100px; }
+.glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; transform: translateY(0); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.glass-card:hover { transform: translateY(-5px); box-shadow: 0 30px 60px -15px rgba(0,0,0,0.3); }
+
+
+/* Report Form Split Screen */
+.split-layout { min-height: calc(100vh - 140px); display: flex; border-radius: 1.5rem; overflow: hidden; box-shadow: var(--shadow-lg); background: var(--surface-color); }
+.split-map-pane { flex: 1; min-width: 300px; position: relative; }
+.split-form-pane { flex: 1; max-width: 600px; padding: 2.5rem; overflow-y: auto; background: var(--surface-color); border-left: 1px solid #e2e8f0; }
+
+/* Drag and Drop Zone */
+.dropzone { border: 2px dashed #cbd5e1; border-radius: 1rem; padding: 2rem; text-align: center; cursor: pointer; transition: all var(--transition-fast); background-color: #f8fafc; }
+.dropzone:hover, .dropzone.dragover { border-color: var(--primary-color); background-color: rgba(59, 130, 246, 0.05); }
+.dropzone-icon { font-size: 2.5rem; color: #94a3b8; margin-bottom: 0.5rem; }
+.dropzone-text { color: #64748b; font-weight: 500; }
+.dropzone img { max-height: 200px; border-radius: 0.5rem; margin-top: 1rem; object-fit: cover; }
+@media (max-width: 991px) { .split-layout { flex-direction: column; } .split-form-pane { max-width: 100%; border-left: none; border-top: 1px solid #e2e8f0; } .split-map-pane { min-height: 400px; } }

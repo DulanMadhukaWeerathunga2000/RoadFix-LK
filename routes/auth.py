@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, logout_user, current_user
 
 from models.models import db, User
 
@@ -36,10 +37,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        session.clear()
-        session["user_id"] = new_user.id
-        session["full_name"] = new_user.full_name
-        session["role"] = new_user.role
+        login_user(new_user)
         flash("Account created. Welcome to RoadFix LK!", "success")
         return redirect(url_for("reports.my_reports"))
 
@@ -48,6 +46,11 @@ def register():
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
+    if current_user.is_authenticated:
+        if current_user.role in ("admin", "officer"):
+            return redirect(url_for("admin.dashboard"))
+        return redirect(url_for("reports.my_reports"))
+
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
@@ -57,21 +60,25 @@ def login():
             flash("Invalid email or password.", "danger")
             return render_template("login.html")
 
-        session.clear()
-        session["user_id"] = user.id
-        session["full_name"] = user.full_name
-        session["role"] = user.role
+        remember = True if request.form.get("remember") else False
+        login_user(user, remember=remember)
+        
         flash(f"Welcome back, {user.full_name}!", "success")
 
-        if user.role in ("admin", "officer"):
-            return redirect(url_for("admin.dashboard"))
-        return redirect(url_for("reports.my_reports"))
+        next_page = request.args.get("next")
+        if not next_page or not next_page.startswith('/'):
+            if user.role in ("admin", "officer"):
+                next_page = url_for("admin.dashboard")
+            else:
+                next_page = url_for("reports.my_reports")
+                
+        return redirect(next_page)
 
     return render_template("login.html")
 
 
 @bp.route("/logout")
 def logout():
-    session.clear()
+    logout_user()
     flash("You have been logged out.", "info")
     return redirect(url_for("auth.login"))
