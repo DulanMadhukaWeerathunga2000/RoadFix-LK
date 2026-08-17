@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, logout_user, current_user
 
 from models.models import db, User
 
@@ -36,10 +37,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        session.clear()
-        session["user_id"] = new_user.id
-        session["full_name"] = new_user.full_name
-        session["role"] = new_user.role
+        login_user(new_user)
         flash("Account created. Welcome to RoadFix LK!", "success")
         return redirect(url_for("reports.my_reports"))
 
@@ -57,10 +55,7 @@ def login():
             flash("Invalid email or password.", "danger")
             return render_template("login.html")
 
-        session.clear()
-        session["user_id"] = user.id
-        session["full_name"] = user.full_name
-        session["role"] = user.role
+        login_user(user)
         flash(f"Welcome back, {user.full_name}!", "success")
 
         if user.role in ("admin", "officer"):
@@ -72,6 +67,6 @@ def login():
 
 @bp.route("/logout")
 def logout():
-    session.clear()
+    logout_user()
     flash("You have been logged out.", "info")
     return redirect(url_for("auth.login"))

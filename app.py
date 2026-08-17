@@ -1,8 +1,10 @@
 import os
-from flask import Flask, redirect, url_for, session
+from flask import Flask, redirect, url_for
+from flask_login import current_user, LoginManager
 
 from config import Config
 from models.db import init_db
+from models.models import User
 from utils.logger import setup_logger
 
 
@@ -14,6 +16,14 @@ def create_app(config_class=Config):
     setup_logger(app)
 
     init_db(app)
+
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = "auth.login"
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
     from routes.auth import bp as auth_bp
     from routes.reports import bp as reports_bp
@@ -27,8 +37,8 @@ def create_app(config_class=Config):
 
     @app.route("/")
     def index():
-        if session.get("user_id"):
-            if session.get("role") in ("admin", "officer"):
+        if current_user.is_authenticated:
+            if current_user.role in ("admin", "officer"):
                 return redirect(url_for("admin.dashboard"))
             return redirect(url_for("reports.my_reports"))
         return redirect(url_for("map_view"))

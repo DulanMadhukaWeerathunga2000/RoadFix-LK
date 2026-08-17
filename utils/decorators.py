@@ -1,16 +1,8 @@
 from functools import wraps
-from flask import session, redirect, url_for, flash, abort
-
-
-def login_required(view):
-    @wraps(view)
-    def wrapped(*args, **kwargs):
-        if session.get("user_id") is None:
-            flash("Please log in to continue.", "warning")
-            return redirect(url_for("auth.login"))
-        return view(*args, **kwargs)
-
-    return wrapped
+from flask import redirect, url_for, flash, abort
+from flask_login import current_user
+# We re-export login_required from flask_login for backward compatibility in our app
+from flask_login import login_required
 
 
 def roles_required(*roles):
@@ -19,10 +11,10 @@ def roles_required(*roles):
     def decorator(view):
         @wraps(view)
         def wrapped(*args, **kwargs):
-            if session.get("user_id") is None:
+            if not current_user.is_authenticated:
                 flash("Please log in to continue.", "warning")
                 return redirect(url_for("auth.login"))
-            if session.get("role") not in roles:
+            if current_user.role not in roles:
                 abort(403)
             return view(*args, **kwargs)
 
